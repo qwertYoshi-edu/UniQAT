@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>単語確認アプリケーション</title>
+    <style>
+        /* --- 基本スタイル --- */
+        :root {
+            --primary-color: #007bff; --secondary-color: #6c757d; --success-color: #28a745; --danger-color: #dc3545;
+            --warning-color: #ffc107; --light-bg: #f8f9fa; --text-color: #212529; --border-color: #dee2e6;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 20px;
+            background-color: var(--light-bg); color: var(--text-color); text-align: center; display: flex;
+            justify-content: center; align-items: center; min-height: 100vh; box-sizing: border-box;
+        }
+        .container { width: 100%; max-width: 600px; padding: 2rem; background-color: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+        .screen { display: none; }
+        .screen.active { display: block; }
+
+        /* --- 初期設定画面 --- */
+        #setup-screen h1 { margin-top: 0; } #setup-screen p { color: #555; }
+        #setup-screen code { background-color: #e9ecef; padding: 2px 6px; border-radius: 4px; }
+        #input-text { width: 100%; height: 150px; padding: 10px; margin: 20px 0; border: 1px solid var(--border-color); border-radius: 4px; font-size: 1rem; resize: vertical; box-sizing: border-box; }
+
+        /* --- メイン画面 --- */
+        .problem-view { display: none; }
+        #progress-display { font-size: 1rem; color: #666; margin-bottom: 2rem; }
+        .large-text { font-size: 2.5rem; font-weight: bold; margin-bottom: 1rem; word-wrap: break-word; display: flex; align-items: center; justify-content: center; gap: 15px; }
+        .small-text { font-size: 1.2rem; color: #666; margin-bottom: 2.5rem; word-wrap: break-word; }
+        
+        /* ▼▼▼ 復習インジケーターのスタイルを更新 ▼▼▼ */
+        .review-indicator {
+            color: var(--danger-color);
+            background-color: #fceeef;
+            font-size: 0.8rem; /* 文字サイズを小さく */
+            font-weight: bold;
+            padding: 4px 8px; /* パディングを追加 */
+            border-radius: 4px; /* 角を丸く */
+            border: 1px solid var(--danger-color);
+            vertical-align: middle; /* 中央揃え */
+        }
+
+        /* [check] 形式 */
+        #check-view .button-container { display: flex; justify-content: center; gap: 15px; }
+        /* [select] 形式 */
+        #select-options-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .select-option-btn.correct { background-color: var(--success-color) !important; color: white; border-color: var(--success-color); }
+        .select-option-btn.incorrect { background-color: var(--danger-color) !important; color: white; border-color: var(--danger-color); }
+
+        /* [enter] [fill] 形式 */
+        .input-form { margin-top: 20px; }
+        .text-input { width: 100%; padding: 12px; font-size: 1rem; border: 1px solid var(--border-color); border-radius: 4px; box-sizing: border-box; margin-bottom: 15px; }
+        #fill-content { text-align: left; line-height: 2; font-size: 1.2rem; margin-bottom: 15px; }
+        .fill-input { padding: 4px 8px; font-size: 1.1rem; border: none; border-bottom: 2px solid var(--primary-color); width: 120px; text-align: center; margin: 0 5px; }
+
+        /* --- フィードバックと次へボタン --- */
+        #feedback-container { display: none; margin-top: 25px; padding: 15px; border-radius: 5px; font-weight: bold; font-size: 1.2rem; }
+        #feedback-container.correct { color: var(--success-color); background-color: #e9f7ef; border: 1px solid var(--success-color); }
+        #feedback-container.incorrect { color: var(--danger-color); background-color: #fceeef; border: 1px solid var(--danger-color); }
+        #next-problem-btn { display: none; margin-top: 15px; }
+        
+        /* --- 中間結果画面 --- */
+        #results-display { font-size: 1.8rem; font-weight: bold; margin: 2rem 0; }
+        .results-options { display: flex; flex-direction: column; gap: 15px; }
+
+        /* --- ボタン共通スタイル --- */
+        button { padding: 12px 24px; font-size: 1rem; font-weight: bold; border: 1px solid transparent; border-radius: 5px; cursor: pointer; transition: background-color 0.2s, transform 0.1s; }
+        button:hover { opacity: 0.9; } button:active { transform: scale(0.98); } button:disabled { cursor: not-allowed; opacity: 0.6; }
+        .btn-primary { background-color: var(--primary-color); color: white; width: 100%; border-color: var(--primary-color); }
+        .btn-success { background-color: var(--success-color); color: white; border-color: var(--success-color); }
+        .btn-secondary { background-color: var(--secondary-color); color: white; border-color: var(--secondary-color); }
+        .select-option-btn { background-color: white; color: var(--primary-color); border: 2px solid var(--primary-color);}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 1. 初期設定画面 -->
+        <div id="setup-screen" class="screen active">
+            <h1>単語確認アプリケーション</h1><p>形式に沿って問題リストを入力してください。</p>
+            <textarea id="input-text" placeholder="[check]apple@りんご#..."></textarea>
+            <button id="start-btn" class="btn-primary">開始</button>
+        </div>
+        <!-- 2. メイン画面 -->
+        <div id="main-screen" class="screen">
+            <div id="progress-display"></div>
+            <div id="check-view" class="problem-view"><div class="large-text"></div><div class="small-text"></div><div class="button-container"><button id="ok-btn" class="btn-success">OK</button><button id="review-btn" class="btn-secondary">後でもう一度確認</button></div></div>
+            <div id="select-view" class="problem-view"><div class="large-text"></div><div class="small-text"></div><div id="select-options-container"></div></div>
+            <div id="enter-view" class="problem-view"><div class="large-text"></div><div class="input-form"><input type="text" id="enter-input" class="text-input" placeholder="答えを入力"><button id="enter-submit-btn" class="btn-primary">回答</button></div></div>
+            <div id="fill-view" class="problem-view"><div class="large-text"></div><div id="fill-content"></div><div class="input-form"><button id="fill-submit-btn" class="btn-primary">回答</button></div></div>
+            <div id="feedback-container"></div><button id="next-problem-btn" class="btn-primary">次へ</button>
+        </div>
+        <!-- 3. 中間結果画面 -->
+        <div id="intermediate-screen" class="screen">
+            <h1>１周目完了！</h1><div id="results-display"></div>
+            <div class="results-options">
+                <button id="retry-incorrect-btn" class="btn-secondary">間違えた問題だけやり直す</button>
+                <button id="retry-all-btn" class="btn-primary">もう一度同じ問題でやり直す</button>
+                <button id="restart-completely-btn" class="btn-secondary">完全に初めからやり直す</button>
+            </div>
+        </div>
+        <!-- 4. 最終完了画面 -->
+        <div id="end-screen" class="screen">
+            <h1>パーフェクト！</h1><p>すべての問題に正解しました。</p>
+            <button id="restart-btn" class="btn-primary">最初からやり直す</button>
+        </div>
+    </div>
+    <script>
+        // --- グローバル変数 ---
+        let originalWordList = [], wordList = [], reviewList = [];
+        let currentIndex = 0, correctCount = 0, currentPassTotal = 0, isReviewPhase = false;
+
+        // --- DOM要素 ---
+        const screens = { setup: document.getElementById('setup-screen'), main: document.getElementById('main-screen'), intermediate: document.getElementById('intermediate-screen'), end: document.getElementById('end-screen') };
+        const views = { check: document.getElementById('check-view'), select: document.getElementById('select-view'), enter: document.getElementById('enter-view'), fill: document.getElementById('fill-view') };
+        const feedbackContainer = document.getElementById('feedback-container');
+        const nextProblemBtn = document.getElementById('next-problem-btn');
+
+        // --- イベントリスナー ---
+        document.getElementById('start-btn').addEventListener('click', startGame);
+        document.getElementById('next-problem-btn').addEventListener('click', moveToNextProblem);
+        document.getElementById('retry-incorrect-btn').addEventListener('click', retryIncorrect);
+        document.getElementById('retry-all-btn').addEventListener('click', retryAll);
+        document.getElementById('restart-completely-btn').addEventListener('click', restartGame);
+        document.getElementById('restart-btn').addEventListener('click', restartGame);
+
+        function switchScreen(screenName) { Object.values(screens).forEach(s => s.classList.remove('active')); screens[screenName].classList.add('active'); }
+
+        function startGame() {
+            const parsedProblems = parseText(document.getElementById('input-text').value);
+            if (parsedProblems.length === 0) { alert('有効な問題がありません。'); return; }
+            originalWordList = [...parsedProblems];
+            startNewPass(originalWordList, false);
+        }
+        
+        function startNewPass(problems, isReview) {
+            wordList = [...problems];
+            reviewList = [];
+            currentIndex = 0;
+            correctCount = 0;
+            currentPassTotal = wordList.length;
+            isReviewPhase = isReview;
+            switchScreen('main');
+            showNextProblem();
+        }
+
+        function retryIncorrect() { if (reviewList.length > 0) startNewPass(reviewList, true); }
+        function retryAll() { startNewPass(originalWordList, false); }
+        function restartGame() { switchScreen('setup'); }
+        
+        function parseText(text) { return text.trim().split('#').map(p => p.trim()).filter(Boolean).map(parseProblem).filter(Boolean); }
+        function parseProblem(pStr){let m;if(m=pStr.match(/^\[check\](.*?)\@(.*)$/s))return{type:'check',largeText:m[1].trim(),smallText:m[2].trim()};if(m=pStr.match(/^\[enter\](.*?)\@(.*)$/s))return{type:'enter',largeText:m[1].trim(),correctAnswer:m[2].trim()};if(m=pStr.match(/^\[select\](.*?)\@(.*?)((?:<[^>]+>|{[^}]+})+)$/s)){const[,largeText,smallText,optionsStr]=m,options=[];let correctAnswer='';[...optionsStr.matchAll(/<([^>]+)>|{([^}]+)}/g)].forEach(o=>{(o[1])?options.push(o[1].trim()):(correctAnswer=o[2].trim(),options.push(correctAnswer))});return{type:'select',largeText:largeText.trim(),smallText:smallText.trim(),options,correctAnswer}}if(m=pStr.match(/^\[fill\](.*?)\@(.*)$/s)){const[,largeText,fillStr]=m,answers=[],parts=[];let lastIndex=0;for(const fm of fillStr.matchAll(/<([^>]+)>/g)){parts.push(fillStr.substring(lastIndex,fm.index));answers.push(fm[1].trim());lastIndex=fm.index+fm[0].length}parts.push(fillStr.substring(lastIndex));return{type:'fill',largeText:largeText.trim(),questionParts:parts,answers}}return null}
+
+        function showNextProblem() {
+            if (currentIndex >= wordList.length) {
+                if (reviewList.length === 0) { switchScreen('end'); } 
+                else { showIntermediateResults(); }
+                return;
+            }
+            updateProgress();
+            feedbackContainer.style.display = 'none'; nextProblemBtn.style.display = 'none';
+            Object.values(views).forEach(v => v.style.display = 'none');
+            
+            const problem = wordList[currentIndex];
+            // ▼▼▼ 復習マークのテキストを変更 ▼▼▼
+            const reviewMark = isReviewPhase ? '<span class="review-indicator">復習</span>' : '';
+            
+            const view = views[problem.type];
+            // .large-text の中身を問題文とマークで分ける
+            const largeTextContent = view.querySelector('.large-text');
+            largeTextContent.innerHTML = ''; // 一旦クリア
+            const textSpan = document.createElement('span');
+            textSpan.textContent = problem.largeText;
+            largeTextContent.appendChild(textSpan);
+            if (isReviewPhase) {
+                largeTextContent.insertAdjacentHTML('beforeend', reviewMark);
+            }
+
+            if (view.querySelector('.small-text')) view.querySelector('.small-text').textContent = problem.smallText || '';
+            view.style.display = 'block';
+
+            if (problem.type === 'check') setupCheck();
+            else if (problem.type === 'select') setupSelect(problem);
+            else if (problem.type === 'enter') setupEnter(problem);
+            else if (problem.type === 'fill') setupFill(problem);
+        }
+
+        function setupCheck() {
+            document.getElementById('ok-btn').onclick = () => { handleAnswerFeedback(true); };
+            document.getElementById('review-btn').onclick = () => { handleAnswerFeedback(false); };
+        }
+        function setupSelect(problem) {
+            const container = document.getElementById('select-options-container'); container.innerHTML = '';
+            [...problem.options].sort(() => Math.random() - 0.5).forEach(optionText => {
+                const btn = document.createElement('button'); btn.textContent = optionText; btn.className = 'select-option-btn';
+                btn.onclick = (e) => {
+                    const isCorrect = (optionText === problem.correctAnswer);
+                    container.querySelectorAll('button').forEach(b => {
+                        b.disabled = true; if (b.textContent === problem.correctAnswer) b.classList.add('correct');
+                    });
+                    if (!isCorrect) e.target.classList.add('incorrect');
+                    handleAnswerFeedback(isCorrect, problem.correctAnswer);
+                };
+                container.appendChild(btn);
+            });
+        }
+        function setupEnter(problem) {
+            const input = document.getElementById('enter-input'), btn = document.getElementById('enter-submit-btn');
+            input.value = ''; input.disabled = false; btn.disabled = false;
+            const handleSubmit = () => {
+                const isCorrect = input.value.trim().toLowerCase() === problem.correctAnswer.trim().toLowerCase();
+                input.disabled = true; btn.disabled = true;
+                handleAnswerFeedback(isCorrect, problem.correctAnswer);
+            };
+            btn.onclick = handleSubmit; input.onkeydown = (e) => { if (e.key === 'Enter') handleSubmit(); };
+        }
+        function setupFill(problem) {
+            const contentDiv = document.getElementById('fill-content'), btn = document.getElementById('fill-submit-btn');
+            contentDiv.innerHTML = ''; btn.disabled = false;
+            problem.questionParts.forEach((part, index) => {
+                contentDiv.appendChild(document.createTextNode(part));
+                if (index < problem.answers.length) contentDiv.appendChild(document.createElement('input')).className = 'fill-input';
+            });
+            btn.onclick = () => {
+                const inputs = [...contentDiv.querySelectorAll('.fill-input')];
+                const userAnswers = inputs.map(i => i.value.trim().toLowerCase());
+                const correctAnswers = problem.answers.map(a => a.trim().toLowerCase());
+                const isCorrect = userAnswers.length === correctAnswers.length && userAnswers.every((val, i) => val === correctAnswers[i]);
+                inputs.forEach(i => i.disabled = true); btn.disabled = true;
+                handleAnswerFeedback(isCorrect, problem.answers.join(', '));
+            };
+        }
+
+        function handleAnswerFeedback(isCorrect, correctAnswerText) {
+            if (isCorrect) correctCount++; else reviewList.push(wordList[currentIndex]);
+            
+            if (wordList[currentIndex].type !== 'check') {
+                feedbackContainer.classList.remove('correct', 'incorrect');
+                if (isCorrect) { feedbackContainer.textContent = '正解！'; feedbackContainer.classList.add('correct'); }
+                else { feedbackContainer.textContent = `不正解　正しい解答: ${correctAnswerText}`; feedbackContainer.classList.add('incorrect'); }
+                feedbackContainer.style.display = 'block'; nextProblemBtn.style.display = 'block';
+            } else { moveToNextProblem(); }
+        }
+        
+        function showIntermediateResults() {
+            switchScreen('intermediate');
+            const percentage = currentPassTotal > 0 ? (correctCount / currentPassTotal * 100) : 0;
+            document.getElementById('results-display').textContent = `正答率: ${percentage.toFixed(0)}% (${correctCount} / ${currentPassTotal} 問)`;
+            document.getElementById('retry-incorrect-btn').disabled = (reviewList.length === 0);
+        }
+
+        function moveToNextProblem() { currentIndex++; showNextProblem(); }
+        function updateProgress() { document.getElementById('progress-display').textContent = `問題 ${currentIndex + 1} / ${currentPassTotal}`; }
+    </script>
+</body>
+</html>
