@@ -37,24 +37,53 @@
 
         .centered-content { justify-content: center; text-align: center; }
         .centered-content h1 { font-size: 2.2rem; margin-top: 0; margin-bottom: 0.5rem; }
-        /* ▼▼▼ pタグの最大幅を調整 ▼▼▼ */
+        .centered-content .description-wrapper { display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
         .centered-content p { font-size: 1.1rem; color: var(--secondary-color); max-width: 600px; margin: 0 auto 1.5rem; }
         #input-text { width: 100%; flex-grow: 1; padding: 1rem; margin: 1rem 0; border: 1px solid var(--border-color);
             border-radius: 12px; font-size: 1rem; resize: none; box-sizing: border-box; font-family: var(--font-family); }
         .importance-filter { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 1.5rem; }
         .importance-filter label { font-size: 1rem; }
-        .results-options { display: flex; flex-direction: column; gap: 1rem; margin-top: auto; width: 100%; max-width: 400px; margin-left: auto; margin-right: auto; }
+        
+        .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; height: 100%; align-items: center; }
+        .incorrect-list-container {
+            height: 100%; display: flex; flex-direction: column;
+            border-right: 1px solid var(--border-color); padding-right: 2rem;
+        }
+        .incorrect-list-container h3 { margin: 0 0 1rem 0; text-align: left; }
+        #incorrect-list {
+            list-style: none; padding: 0; margin: 0; overflow-y: auto; text-align: left;
+            flex-grow: 1;
+        }
+        /* ▼▼▼ 間違えた問題リストのスタイルを更新 ▼▼▼ */
+        #incorrect-list li {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            gap: 1rem; padding: 0.8rem 0; border-bottom: 1px solid var(--light-bg);
+            font-size: 0.95rem;
+        }
+        #incorrect-list li:last-child { border-bottom: none; }
+        .incorrect-item-content { display: flex; gap: 0.8rem; align-items: flex-start; min-width: 0; }
+        .incorrect-item-importance { color: var(--star-color); font-size: 0.9rem; flex-shrink: 0; letter-spacing: 1px; }
+        .incorrect-item-text { word-break: break-all; }
+        .incorrect-item-answer {
+            color: var(--primary-color); font-weight: 600; text-align: right;
+            flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            max-width: 120px;
+        }
 
-        .results-summary { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .results-summary-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; }
         .results-visual {
-            width: 180px; height: 180px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            width: 150px; height: 150px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
             background: conic-gradient(var(--progress-color, var(--primary-color)) calc(var(--percentage) * 1%), var(--light-bg) 0);
             margin-bottom: 1.5rem; position: relative;
         }
         .results-visual::before { content: ''; position: absolute; width: 85%; height: 85%; background: var(--card-bg); border-radius: 50%; }
-        #results-percentage { font-size: 3rem; font-weight: 700; z-index: 1; color: var(--progress-color, var(--primary-color)); }
-        #results-details { font-size: 1.2rem; color: var(--secondary-color); }
+        #results-percentage { font-size: 2.5rem; font-weight: 700; z-index: 1; color: var(--progress-color, var(--primary-color)); }
+        #results-details { font-size: 1.1rem; color: var(--secondary-color); margin-bottom: 2rem; }
+        .results-options { display: flex; flex-direction: column; gap: 1rem; width: 100%; max-width: 300px; }
+        
+        #end-screen .results-summary { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         #end-screen .results-visual { --progress-color: var(--success-color); }
+        #end-screen .results-options { margin-top: auto; }
         
         #main-screen { justify-content: space-between; }
         #progress-area { flex-shrink: 0; }
@@ -73,11 +102,7 @@
         .review-indicator { color: var(--danger-color); background-color: var(--danger-bg); font-size: 0.8rem; font-weight: bold; padding: 5px 10px; border-radius: 8px; vertical-align: middle; flex-shrink: 0; }
         .problem-view { width: 100%; }
         
-        #select-options-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 0.8rem; margin-top: 1.5rem; width: 100%;
-        }
+        #select-options-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.8rem; margin-top: 1.5rem; width: 100%; }
         #fill-content { text-align: center; line-height: 1.8; font-size: 1.15rem; margin-bottom: 1.5rem; width: 100%; }
         
         .input-form { max-width: 500px; width: 100%; margin: 0 auto; }
@@ -107,16 +132,31 @@
         .button-container.active { display: flex; }
         #action-btn { display: none; max-width: 500px; margin: 0 auto; }
         #action-btn.visible { display: block; }
+        
+        #help-btn { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border-color); background: var(--card-bg); color: var(--secondary-color); font-size: 1.1rem; font-weight: bold; line-height: 1; padding: 0; flex-shrink: 0; cursor: pointer; transition: all 0.2s; }
+        #help-btn:hover { border-color: var(--primary-color); color: var(--primary-color); }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; }
+        .modal.active { opacity: 1; visibility: visible; }
+        .modal-overlay { position: absolute; width: 100%; height: 100%; background: rgba(0,0,0,0.6); }
+        .modal-content { position: relative; background: var(--card-bg); padding: 2rem; border-radius: 16px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; text-align: left; transform: scale(0.95); transition: transform 0.3s; }
+        .modal.active .modal-content { transform: scale(1); }
+        .modal-content h2 { margin-top: 0; }
+        .modal-close-btn { position: absolute; top: 0.75rem; right: 0.75rem; width: 44px; height: 44px; border: none; background: transparent; font-size: 1.5rem; cursor: pointer; color: var(--secondary-color); line-height: 1; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background-color 0.2s, color 0.2s; }
+        .modal-close-btn:hover { background-color: var(--light-bg); color: var(--text-color); }
+        .modal-rules { list-style: none; padding: 0; }
+        .modal-rules li { margin-bottom: 1.5rem; }
+        .modal-rules code { background-color: var(--light-bg); padding: 3px 6px; border-radius: 4px; font-size: 0.9em; }
+        .modal-rules small { display: block; margin-top: 0.5rem; color: var(--secondary-color); padding-left: 1rem; border-left: 2px solid var(--border-color); }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- ▼▼▼ h1とpの内容を変更 ▼▼▼ -->
-        <div id="setup-screen" class="screen active centered-content"><h1>汎用一問一答トレーニング</h1><p>学習したい内容を貼り付け、「開始」ボタンを押してください。</p><textarea id="input-text" placeholder="例: [check]apple@りんご_3#"></textarea><div class="importance-filter"><span>絞り込み:</span><label><input type="radio" name="importance" value="1-3" checked>すべて</label><label><input type="radio" name="importance" value="2-3">重要</label><label><input type="radio" name="importance" value="3-3">最重要</label></div><button id="start-btn" class="btn-primary">開始</button></div>
+        <div id="setup-screen" class="screen active centered-content"><h1>汎用一問一答トレーニング</h1><div class="description-wrapper"><p>学習したい内容を貼り付け、「開始」ボタンを押してください。</p><button id="help-btn" aria-label="入力形式のヘルプ">?</button></div><textarea id="input-text" placeholder="例: [check]apple@りんご_3#"></textarea><div class="importance-filter"><span>絞り込み:</span><label><input type="radio" name="importance" value="1-3" checked>すべて</label><label><input type="radio" name="importance" value="2-3">重要</label><label><input type="radio" name="importance" value="3-3">最重要</label></div><button id="start-btn" class="btn-primary">開始</button></div>
         <div id="main-screen" class="screen"><div id="progress-area"><div id="progress-bar-container"><div id="progress-bar"></div></div><div class="progress-info"><div id="progress-text"></div><div id="importance-display"></div></div></div><div id="content-area"><div id="check-view" class="problem-view"><div class="large-text"></div><div class="small-text"></div></div><div id="select-view" class="problem-view"><div class="large-text"></div><div class="small-text"></div><div id="select-options-container"></div></div><div id="enter-view" class="problem-view"><div class="large-text"></div><div class="input-form"><input type="text" id="enter-input" class="text-input" placeholder="答えを入力"></div></div><div id="fill-view" class="problem-view"><div class="large-text"></div><div id="fill-content"></div><div class="input-form"></div></div></div><div id="action-area"><div id="feedback-container"></div><div id="check-button-container" class="button-container input-form"><button id="review-btn" class="btn-secondary">後でもう一度確認</button><button id="ok-btn" class="btn-success">OK</button></div><button id="action-btn" class="btn-primary"></button></div></div>
-        <div id="intermediate-screen" class="screen centered-content"><h1>お疲れ様でした！</h1><div class="results-summary"><div class="results-visual"><span id="results-percentage"></span></div><div id="results-details"></div></div><div class="results-options"><button id="retry-incorrect-btn" class="btn-primary">間違えた問題を復習</button><button id="retry-all-btn" class="btn-secondary">もう一度すべて解く</button><button id="restart-completely-btn" class="btn-secondary">新しい問題で始める</button></div></div>
+        <div id="intermediate-screen" class="screen"><div class="results-grid"><div class="incorrect-list-container"><h3>間違えた問題</h3><ul id="incorrect-list"></ul></div><div class="results-summary-container"><h1>お疲れ様でした！</h1><div class="results-summary"><div class="results-visual"><span id="results-percentage"></span></div><div id="results-details"></div></div><div class="results-options"><button id="retry-incorrect-btn" class="btn-primary">間違えた問題を復習</button><button id="retry-all-btn" class="btn-secondary">もう一度すべて解く</button><button id="restart-completely-btn" class="btn-secondary">新しい問題で始める</button></div></div></div></div>
         <div id="end-screen" class="screen centered-content"><h1>パーフェクト！</h1><div class="results-summary"><div class="results-visual"><span id="end-percentage">100%</span></div><p>すべての問題をマスターしました！</p></div><div class="results-options"><button id="restart-btn" class="btn-primary">新しい問題で始める</button></div></div>
     </div>
+    <div id="help-modal" class="modal"><div class="modal-overlay"></div><div class="modal-content"><button class="modal-close-btn">&times;</button><h2>入力形式のルール</h2><p>各問題は <code>#</code> で区切ります。問題の形式は <code>[...]</code> で指定し、末尾に <code>_重要度</code> を追加します。</p><ul class="modal-rules"><li><strong>[check]</strong> シンプルな確認問題<br><code>[check]質問@答え_重要度#</code><small>例: [check]apple@りんご_3#</small></li><li><strong>[select]</strong> 選択肢問題 (正解は <code>{}</code> で囲む)<br><code>[select]質問@説明_重要度{正解}&lt;不正解1&gt;&lt;不正解2&gt;#</code><small>例: [select]日本の首都は？@選んでください_3{東京}&lt;大阪&gt;#</small></li><li><strong>[enter]</strong> テキスト入力問題<br><code>[enter]質問@答え_重要度#</code><small>例: [enter]1+1=?@2_1#</small></li><li><strong>[fill]</strong> 穴埋め問題 (穴埋め箇所を <code>&lt;&gt;</code> で囲む)<br><code>[fill]質問@本文&lt;答え1&gt;本文&lt;答え2&gt;_重要度#</code><small>例: [fill]ことわざ@犬も歩けば&lt;棒&gt;にあたる_2#</small></li></ul><p><strong>重要度:</strong> <code>_1</code> (低), <code>_2</code> (中), <code>_3</code> (高) の3段階で指定します。省略した場合は <code>_1</code> になります。</p></div></div>
     <script>
         let originalWordList = [], wordList = [], reviewList = [];
         let currentIndex = 0, correctCount = 0, currentPassTotal = 0, isReviewPhase = false, currentScreen = 'setup';
@@ -125,7 +165,12 @@
         const feedbackContainer = document.getElementById('feedback-container'), actionBtn = document.getElementById('action-btn'),
               checkButtonContainer = document.getElementById('check-button-container'), progressBar = document.getElementById('progress-bar'),
               progressText = document.getElementById('progress-text'), importanceDisplay = document.getElementById('importance-display');
+        const helpBtn = document.getElementById('help-btn'), helpModal = document.getElementById('help-modal'),
+              modalOverlay = helpModal.querySelector('.modal-overlay'), modalCloseBtn = helpModal.querySelector('.modal-close-btn');
         
+        helpBtn.addEventListener('click', () => helpModal.classList.add('active'));
+        modalOverlay.addEventListener('click', () => helpModal.classList.remove('active'));
+        modalCloseBtn.addEventListener('click', () => helpModal.classList.remove('active'));
         document.getElementById('start-btn').addEventListener('click', startGame);
         document.getElementById('retry-incorrect-btn').addEventListener('click', retryIncorrect);
         document.getElementById('retry-all-btn').addEventListener('click', retryAll);
@@ -225,6 +270,24 @@
             visualEl.style.setProperty('--progress-color', color);
             document.getElementById('results-percentage').style.color = color;
             document.getElementById('retry-incorrect-btn').disabled = (reviewList.length === 0);
+            
+            const listEl = document.getElementById('incorrect-list');
+            listEl.innerHTML = '';
+            reviewList
+                .sort((a, b) => b.importance - a.importance)
+                .forEach(problem => {
+                    const li = document.createElement('li');
+                    let correctAnswerText = '';
+                    switch (problem.type) {
+                        case 'check': correctAnswerText = problem.smallText; break;
+                        case 'enter':
+                        case 'select': correctAnswerText = problem.correctAnswer; break;
+                        case 'fill': correctAnswerText = problem.answers.join(', '); break;
+                    }
+                    const importanceStars = '★'.repeat(problem.importance) + '☆'.repeat(3 - problem.importance);
+                    li.innerHTML = `<div class="incorrect-item-content"><span class="incorrect-item-importance">${importanceStars}</span><span class="incorrect-item-text">${problem.largeText}</span></div><span class="incorrect-item-answer">${correctAnswerText}</span>`;
+                    listEl.appendChild(li);
+                });
         }
         function moveToNextProblem() { currentIndex++; showNextProblem(); }
         function updateProgress() {
