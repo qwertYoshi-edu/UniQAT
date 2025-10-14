@@ -8,16 +8,17 @@
         :root {
             --primary-color: #007aff; --primary-hover: #005ecb;
             --secondary-color: #6c757d; --secondary-hover: #5a6268;
-            --success-color: #34c759; --success-bg: #eaf8ee;
-            --danger-color: #ff3b30;  --danger-bg: #ffeeed;
+            --success-color: #34c759; --success-bg: rgba(52, 199, 89, 0.1); --success-text-on-bg: #2d8a4c;
+            --danger-color: #ff3b30;  --danger-bg: rgba(255, 59, 48, 0.1); --danger-text-on-bg: #c72d23;
             --warning-color: #ff9500;
             --star-color: #ffcc00;
             --light-bg: #f2f2f7; --text-color: #1c1c1e;
             --card-bg: #ffffff; --border-color: #e5e5ea;
             --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+            --accent-color: var(--primary-color);
         }
 
-        html { font-size: 15px; } 
+        html { font-size: 15px; }
 
         body {
             font-family: var(--font-family); margin: 0; padding: 15px; background-color: var(--light-bg);
@@ -26,105 +27,115 @@
         }
 
         .container {
-            width: 100%; max-width: 960px; height: 70vh; max-height: 700px; 
-            padding: 2rem 1.5rem; background-color: var(--card-bg); border-radius: 20px; 
+            width: 100%; max-width: 800px; height: 70vh; max-height: 700px;
+            padding: 2rem 1.5rem; background-color: var(--card-bg); border-radius: 20px;
             box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column; overflow: hidden;
+            position: relative;
         }
+        #confetti-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2000; }
 
         .screen { display: none; height: 100%; flex-direction: column; opacity: 0; transition: opacity 0.3s ease-in-out; }
         .screen.active { display: flex; }
         .screen.visible { opacity: 1; }
 
-        .centered-content { justify-content: center; text-align: center; }
+        .centered-content { justify-content: center; align-items: center; text-align: center; }
         .centered-content h1 { font-size: 2.2rem; margin-top: 0; margin-bottom: 0.5rem; }
         .centered-content .description-wrapper { display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
         .centered-content p { font-size: 1.1rem; color: var(--secondary-color); max-width: 600px; margin: 0 auto 1.5rem; }
         #input-text { width: 100%; flex-grow: 1; padding: 1rem; margin: 1rem 0; border: 1px solid var(--border-color);
             border-radius: 12px; font-size: 1rem; resize: none; box-sizing: border-box; font-family: var(--font-family); }
-        .importance-filter { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 1.5rem; }
-        .importance-filter label { font-size: 1rem; }
-        
-        /* ▼▼▼ グリッドのオーバーフロー問題を修正 ▼▼▼ */
-        .results-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: minmax(0, 1fr); /* この行が重要です */
-            gap: 2rem;
-            height: 100%;
-        }
-        .incorrect-list-container {
-            height: 100%; display: flex; flex-direction: column;
-            border-right: 1px solid var(--border-color); padding-right: 2rem;
-            min-height: 0; /* flexアイテムの縮小を許可 */
-        }
+        .settings-container { display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 1.5rem; }
+        .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: center; }
+        .setting-item { text-align: left; }
+        .setting-item label { font-weight: 600; margin-bottom: 0.5rem; display: block; }
+        .setting-item-row { display: flex; justify-content: flex-start; gap: 1rem; align-items: center; }
+        .importance-filter { display: flex; justify-content: flex-start; gap: 1rem; }
+        .importance-filter label, .shuffle-label { font-size: 1rem; font-weight: normal; }
+        input[type="range"] { width: 100%; }
+        #start-btn { margin-top: 20px; }
+
+        .results-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: minmax(0, 1fr); gap: 2rem; height: 100%; }
+        .incorrect-list-container { height: 100%; display: flex; flex-direction: column; border-right: 1px solid var(--border-color); padding-right: 2rem; min-height: 0; }
         .incorrect-list-container h3 { margin: 0 0 1rem 0; text-align: left; flex-shrink: 0; }
-        #incorrect-list {
-            list-style: none; padding: 0; margin: 0; overflow-y: auto; text-align: left;
-            flex-grow: 1;
-        }
-        #incorrect-list li {
-            display: flex; justify-content: space-between; align-items: flex-start;
-            gap: 1rem; padding: 0.8rem 0; border-bottom: 1px solid var(--light-bg);
-            font-size: 0.95rem;
-        }
+        #incorrect-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; text-align: left; flex-grow: 1; }
+        #incorrect-list li { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; padding: 0.8rem 0; border-bottom: 1px solid var(--light-bg); font-size: 0.95rem; }
         #incorrect-list li:last-child { border-bottom: none; }
         .incorrect-item-content { display: flex; gap: 0.8rem; align-items: flex-start; min-width: 0; }
         .incorrect-item-importance { color: var(--star-color); font-size: 0.9rem; flex-shrink: 0; letter-spacing: 1px; }
         .incorrect-item-text { word-break: break-all; }
-        .incorrect-item-answer {
-            color: var(--primary-color); font-weight: 600; text-align: right;
-            flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            max-width: 120px;
-        }
+        .incorrect-item-answer { color: var(--primary-color); font-weight: 600; text-align: right; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
 
         .results-summary-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; }
-        .results-visual {
-            width: 150px; height: 150px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            background: conic-gradient(var(--progress-color, var(--primary-color)) calc(var(--percentage) * 1%), var(--light-bg) 0);
-            margin-bottom: 1.5rem; position: relative;
-        }
+        .results-visual { width: 150px; height: 150px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: conic-gradient(var(--progress-color, var(--primary-color)) calc(var(--percentage) * 1%), var(--light-bg) 0); margin-bottom: 1.5rem; position: relative; }
         .results-visual::before { content: ''; position: absolute; width: 85%; height: 85%; background: var(--card-bg); border-radius: 50%; }
         #results-percentage { font-size: 2.5rem; font-weight: 700; z-index: 1; color: var(--progress-color, var(--primary-color)); }
         #results-details { font-size: 1.1rem; color: var(--secondary-color); margin-bottom: 2rem; }
-        .results-options { display: flex; flex-direction: column; gap: 1rem; width: 100%; max-width: 300px; }
-        
-        #end-screen .results-summary { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        #end-screen .results-visual { --progress-color: var(--success-color); }
-        #end-screen .results-options { margin-top: auto; }
-        
+        .results-options { display: flex; flex-direction: column; gap: 1rem; width: 100%; max-width: 300px; margin: auto 0 0; }
+
+        /* --- PERFECT SCREEN STYLES --- */
+        #end-screen { gap: 1.2rem; }
+        #end-screen h1 {
+            font-weight: 700;
+            font-size: 2.5rem;
+            margin: 0;
+            transform: scale(1.4);
+            opacity: 0;
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        #end-screen.is-animating h1 { transform: scale(1); opacity: 1; }
+        #end-screen .results-summary { flex-grow: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        #end-screen .results-visual { width: 140px; height: 140px; margin-bottom: 0.5rem; --progress-color: var(--success-color); }
+        #end-screen #end-percentage {
+            font-weight: 700;
+            font-size: 30px;
+            color: var(--success-color);
+            z-index: 1;
+        }
+        #end-screen .results-options { margin: 0 auto; max-width: 300px; width: 100%; }
+        /* --- END PERFECT SCREEN --- */
+
+
         #main-screen { justify-content: space-between; }
         #progress-area { flex-shrink: 0; }
         #content-area { flex-grow: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; overflow-y: auto; padding: 1rem 0; width: 100%; }
         #action-area { flex-shrink: 0; min-height: 90px; display: flex; flex-direction: column; justify-content: flex-end; padding-top: 1rem; }
-        
+
         #progress-bar-container { width: 100%; height: 10px; background-color: var(--light-bg); border-radius: 5px; overflow: hidden; }
         #progress-bar { width: 0%; height: 100%; background-color: var(--primary-color); border-radius: 5px; transition: width 0.4s ease; }
         .progress-info { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+        .progress-info-left { display: flex; align-items: center; gap: 1rem; }
         #progress-text { font-size: 1.1rem; color: var(--secondary-color); }
+        #mistake-counter { font-size: 1.1rem; color: var(--danger-color); font-weight: 600; visibility: hidden; }
+        #mistake-counter.visible { visibility: visible; }
         #importance-display { font-size: 1.3rem; color: var(--star-color); letter-spacing: 2px; }
 
-        .large-text { font-size: 2.0rem; font-weight: 700; margin-bottom: 0.8rem; line-height: 1.3;
-            word-wrap: break-word; display: flex; align-items: center; justify-content: center; gap: 1rem; width: 100%; }
+        .large-text { font-size: 2.0rem; font-weight: 700; margin-bottom: 0.8rem; line-height: 1.3; word-wrap: break-word; display: flex; align-items: center; justify-content: center; gap: 1rem; width: 100%; }
         .small-text { font-size: 1.1rem; color: var(--secondary-color); margin-bottom: 1.5rem; width: 100%; word-wrap: break-word; line-height: 1.5; }
         .review-indicator { color: var(--danger-color); background-color: var(--danger-bg); font-size: 0.8rem; font-weight: bold; padding: 5px 10px; border-radius: 8px; vertical-align: middle; flex-shrink: 0; }
-        .problem-view { width: 100%; }
-        
+        .problem-view { width: 100%; transition: opacity 300ms ease-out, transform 300ms ease-out; }
+        .problem-view.is-entering { opacity: 0; transform: translateY(20px); }
+
         #select-options-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.8rem; margin-top: 1.5rem; width: 100%; }
         #fill-content { text-align: center; line-height: 1.8; font-size: 1.15rem; margin-bottom: 1.5rem; width: 100%; }
-        
+        .fill-prefilled { font-weight: 600; color: var(--primary-color); border-bottom: 2px solid var(--border-color); padding: 4px 8px; margin: 0 5px; }
+
         .input-form { max-width: 500px; width: 100%; margin: 0 auto; }
         .text-input { width: 100%; padding: 1rem; font-size: 1.1rem; border: 2px solid var(--border-color); border-radius: 12px; box-sizing: border-box; margin-bottom: 1rem; text-align: center; transition: border-color 0.2s; }
         .text-input:focus { border-color: var(--primary-color); outline: none; }
-        .fill-input { padding: 4px 8px; font-size: 1.1rem; border: none; border-bottom: 2px solid var(--primary-color); width: 120px; text-align: center; margin: 0 5px; background: transparent; }
-        
-        #feedback-container { opacity: 0; transform: translateY(10px); transition: opacity 0.3s, transform 0.3s; margin-bottom: 1rem; padding: 1rem; border-radius: 12px; font-weight: 600; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+        .fill-input { padding: 4px 8px; font-size: 1.1rem; border: none; border-bottom: 2px solid var(--primary-color); width: 120px; text-align: center; margin: 0 5px; background: transparent; transition: all 0.2s; border-radius: 4px 4px 0 0;}
+        .fill-input.correct { border-bottom-color: var(--success-color); background-color: var(--success-bg); color: var(--success-text-on-bg); }
+        .fill-input.incorrect { border-bottom-color: var(--danger-color); background-color: var(--danger-bg); color: var(--danger-text-on-bg); }
+
+        #feedback-container { opacity: 0; transform: translateY(10px); transition: opacity 0.3s, transform 0.3s; margin-bottom: 1rem; padding: 1rem; border-radius: 12px; font-weight: 600; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; position: relative; }
         #feedback-container.visible { opacity: 1; transform: translateY(0); }
-        #feedback-container.correct { color: var(--success-color); background-color: var(--success-bg); }
-        #feedback-container.incorrect { color: var(--danger-color); background-color: var(--danger-bg); }
-        #feedback-container::before { font-weight: bold; font-size: 1.3em; }
-        #feedback-container.correct::before { content: '✓'; }
-        #feedback-container.incorrect::before { content: '×'; }
-        
+        #feedback-container.correct { color: var(--success-text-on-bg); background-color: var(--success-bg); }
+        #feedback-container.incorrect { color: var(--danger-text-on-bg); background-color: var(--danger-bg); }
+        #feedback-text::before { font-weight: bold; font-size: 1.3em; margin-right: 0.5rem; }
+        #feedback-container.correct #feedback-text::before { content: '✓'; }
+        #feedback-container.incorrect #feedback-text::before { content: '×'; }
+        #add-to-review-btn { font-size: 0.8rem; padding: 4px 10px; width: auto; position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); background-color: var(--secondary-color); color: white; border-radius: 8px; }
+        #add-to-review-btn:disabled { background-color: var(--border-color); color: var(--secondary-color); }
+
         button { padding: 1rem; font-size: 1rem; font-weight: 600; border: none; border-radius: 12px; cursor: pointer; transition: background-color 0.2s, transform 0.1s; width: 100%; }
         button:hover { opacity: 0.9; } button:active { transform: scale(0.98); } button:disabled { opacity: 0.5; cursor: not-allowed; }
         .btn-primary { background-color: var(--primary-color); color: white; } .btn-primary:hover { background-color: var(--primary-hover); }
@@ -132,49 +143,90 @@
         .btn-success { background-color: var(--success-color); color: white; }
         .select-option-btn { background-color: var(--card-bg); color: var(--primary-color); border: 2px solid var(--border-color); font-weight: 500; }
         .select-option-btn:hover { border-color: var(--primary-color); background-color: #f2f8ff; }
-        .select-option-btn.correct { background-color: var(--success-bg) !important; color: var(--success-color); border-color: var(--success-color); }
-        .select-option-btn.incorrect { background-color: var(--danger-bg) !important; color: var(--danger-color); border-color: var(--danger-color); }
-        
+        .select-option-btn.correct { background-color: var(--success-bg) !important; color: var(--success-text-on-bg); border-color: var(--success-color); }
+        .select-option-btn.incorrect { background-color: var(--danger-bg) !important; color: var(--danger-text-on-bg); border-color: var(--danger-color); }
+
         .button-container { display: none; justify-content: center; gap: 1rem; }
         .button-container.active { display: flex; }
         #action-btn { display: none; max-width: 500px; margin: 0 auto; }
         #action-btn.visible { display: block; }
-        
+
         #help-btn { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border-color); background: var(--card-bg); color: var(--secondary-color); font-size: 1.1rem; font-weight: bold; line-height: 1; padding: 0; flex-shrink: 0; cursor: pointer; transition: all 0.2s; }
         #help-btn:hover { border-color: var(--primary-color); color: var(--primary-color); }
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; background: rgba(0,0,0,0.6); }
         .modal.active { opacity: 1; visibility: visible; }
-        .modal-overlay { position: absolute; width: 100%; height: 100%; background: rgba(0,0,0,0.6); }
+        .modal-overlay { position: absolute; width: 100%; height: 100%; }
         .modal-content { position: relative; background: var(--card-bg); padding: 2rem; border-radius: 16px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; text-align: left; transform: scale(0.95); transition: transform 0.3s; }
         .modal.active .modal-content { transform: scale(1); }
         .modal-content h2 { margin-top: 0; }
         .modal-close-btn { position: absolute; top: 0.75rem; right: 0.75rem; width: 44px; height: 44px; border: none; background: transparent; font-size: 1.5rem; cursor: pointer; color: var(--secondary-color); line-height: 1; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background-color 0.2s, color 0.2s; }
         .modal-close-btn:hover { background-color: var(--light-bg); color: var(--text-color); }
-        .modal-rules { list-style: none; padding: 0; }
-        .modal-rules li { margin-bottom: 1.5rem; }
-        .modal-rules code { background-color: var(--light-bg); padding: 3px 6px; border-radius: 4px; font-size: 0.9em; }
-        .modal-rules small { display: block; margin-top: 0.5rem; color: var(--secondary-color); padding-left: 1rem; border-left: 2px solid var(--border-color); }
+        .modal-rules { list-style: none; padding: 0; margin: 1.5rem 0; }
+        .modal-rules li { position: relative; padding-left: 22px; margin-bottom: 1rem; }
+        .modal-rules li::before { content: '▶'; position: absolute; left: 0; top: 1px; color: var(--accent-color); }
+        .modal-rules code { background-color: var(--light-bg); padding: 3px 6px; border-radius: 4px; font-size: 0.9em; color: var(--accent-color); font-weight: 600;}
+        .copy-example { background-color: var(--light-bg); border: 1px solid var(--border-color); padding: 1rem; border-radius: 8px; white-space: pre-wrap; word-break: break-all; font-family: monospace; font-size: 0.9rem; line-height: 1.6; }
     </style>
 </head>
 <body>
     <div class="container">
-        <div id="setup-screen" class="screen active centered-content"><h1>汎用一問一答トレーニング</h1><div class="description-wrapper"><p>学習したい内容を貼り付け、「開始」ボタンを押してください。</p><button id="help-btn" aria-label="入力形式のヘルプ">?</button></div><textarea id="input-text" placeholder="例: [check]apple@りんご_3#"></textarea><div class="importance-filter"><span>絞り込み:</span><label><input type="radio" name="importance" value="1-3" checked>すべて</label><label><input type="radio" name="importance" value="2-3">重要</label><label><input type="radio" name="importance" value="3-3">最重要</label></div><button id="start-btn" class="btn-primary">開始</button></div>
-        <div id="main-screen" class="screen"><div id="progress-area"><div id="progress-bar-container"><div id="progress-bar"></div></div><div class="progress-info"><div id="progress-text"></div><div id="importance-display"></div></div></div><div id="content-area"><div id="check-view" class="problem-view"><div class="large-text"></div><div class="small-text"></div></div><div id="select-view" class="problem-view"><div class="large-text"></div><div class="small-text"></div><div id="select-options-container"></div></div><div id="enter-view" class="problem-view"><div class="large-text"></div><div class="input-form"><input type="text" id="enter-input" class="text-input" placeholder="答えを入力"></div></div><div id="fill-view" class="problem-view"><div class="large-text"></div><div id="fill-content"></div><div class="input-form"></div></div></div><div id="action-area"><div id="feedback-container"></div><div id="check-button-container" class="button-container input-form"><button id="review-btn" class="btn-secondary">後でもう一度確認</button><button id="ok-btn" class="btn-success">OK</button></div><button id="action-btn" class="btn-primary"></button></div></div>
+        <canvas id="confetti-canvas"></canvas>
+        <div id="setup-screen" class="screen active centered-content">
+            <h1>汎用一問一答トレーニング</h1>
+            <div class="description-wrapper">
+                <p>学習したい内容を貼り付け、オプションを選択して開始してください。</p>
+                <button id="help-btn" aria-label="入力形式のヘルプ">?</button>
+            </div>
+            <textarea id="input-text" placeholder="ここに問題リストを貼り付けます。形式は「?」ボタンで確認できます。"></textarea>
+            <div class="settings-container">
+                <div class="settings-grid">
+                    <div class="setting-item"><label>重要度で絞り込み</label><div class="importance-filter"><label><input type="radio" name="importance" value="1-3" checked>すべて</label><label><input type="radio" name="importance" value="2-3">重要</label><label><input type="radio" name="importance" value="3-3">最重要</label></div></div>
+                    <div class="setting-item"><label for="fill-rate-slider">穴埋め問題の空欄率: <span id="fill-rate-value">100</span>%</label><input type="range" id="fill-rate-slider" min="50" max="100" value="100"></div>
+                </div>
+                <div class="setting-item-row"><input type="checkbox" id="shuffle-checkbox"><label for="shuffle-checkbox" class="shuffle-label">出題順をランダムにする</label></div>
+            </div>
+            <button id="start-btn" class="btn-primary">開始</button>
+        </div>
+
+        <div id="main-screen" class="screen"><div id="progress-area"><div id="progress-bar-container"><div id="progress-bar"></div></div><div class="progress-info"><div class="progress-info-left"><div id="progress-text"></div><div id="mistake-counter"></div></div><div id="importance-display"></div></div></div><div id="content-area"><div id="check-view" class="problem-view"><div class="large-text"></div><div class="small-text"></div></div><div id="select-view" class="problem-view"><div class="large-text"></div><div class="small-text"></div><div id="select-options-container"></div></div><div id="enter-view" class="problem-view"><div class="large-text"></div><div class="input-form"><input type="text" id="enter-input" class="text-input" placeholder="答えを入力"></div></div><div id="fill-view" class="problem-view"><div class="large-text"></div><div id="fill-content"></div><div class="input-form"></div></div></div><div id="action-area"><div id="feedback-container"><span id="feedback-text"></span><button id="add-to-review-btn">復習リストに追加</button></div><div id="check-button-container" class="button-container input-form"><button id="review-btn" class="btn-secondary">後でもう一度確認</button><button id="ok-btn" class="btn-success">OK</button></div><button id="action-btn" class="btn-primary"></button></div></div>
         <div id="intermediate-screen" class="screen"><div class="results-grid"><div class="incorrect-list-container"><h3>間違えた問題</h3><ul id="incorrect-list"></ul></div><div class="results-summary-container"><h1>お疲れ様でした！</h1><div class="results-summary"><div class="results-visual"><span id="results-percentage"></span></div><div id="results-details"></div></div><div class="results-options"><button id="retry-incorrect-btn" class="btn-primary">間違えた問題を復習</button><button id="retry-all-btn" class="btn-secondary">もう一度すべて解く</button><button id="restart-completely-btn" class="btn-secondary">新しい問題で始める</button></div></div></div></div>
-        <div id="end-screen" class="screen centered-content"><h1>パーフェクト！</h1><div class="results-summary"><div class="results-visual"><span id="end-percentage">100%</span></div><p>すべての問題をマスターしました！</p></div><div class="results-options"><button id="restart-btn" class="btn-primary">新しい問題で始める</button></div></div>
+        
+        <div id="end-screen" class="screen centered-content">
+            <h1>パーフェクト！</h1>
+            <div class="results-summary">
+                <div class="results-visual">
+                    <span id="end-percentage">0%</span>
+                </div>
+                <p>すべての問題をマスターしました！</p>
+            </div>
+            <div class="results-options">
+                <button id="end-retry-all-btn" class="btn-primary">もう一度すべて解く</button>
+                <button id="end-restart-btn" class="btn-secondary">新しい問題で始める</button>
+            </div>
+        </div>
     </div>
-    <div id="help-modal" class="modal"><div class="modal-overlay"></div><div class="modal-content"><button class="modal-close-btn">&times;</button><h2>入力形式のルール</h2><p>各問題は <code>#</code> で区切ります。問題の形式は <code>[...]</code> で指定し、末尾に <code>_重要度</code> を追加します。</p><ul class="modal-rules"><li><strong>[check]</strong> シンプルな確認問題<br><code>[check]質問@答え_重要度#</code><small>例: [check]apple@りんご_3#</small></li><li><strong>[select]</strong> 選択肢問題 (正解は <code>{}</code> で囲む)<br><code>[select]質問@説明_重要度{正解}&lt;不正解1&gt;&lt;不正解2&gt;#</code><small>例: [select]日本の首都は？@選んでください_3{東京}&lt;大阪&gt;#</small></li><li><strong>[enter]</strong> テキスト入力問題<br><code>[enter]質問@答え_重要度#</code><small>例: [enter]1+1=?@2_1#</small></li><li><strong>[fill]</strong> 穴埋め問題 (穴埋め箇所を <code>&lt;&gt;</code> で囲む)<br><code>[fill]質問@本文&lt;答え1&gt;本文&lt;答え2&gt;_重要度#</code><small>例: [fill]ことわざ@犬も歩けば&lt;棒&gt;にあたる_2#</small></li></ul><p><strong>重要度:</strong> <code>_1</code> (低), <code>_2</code> (中), <code>_3</code> (高) の3段階で指定します。省略した場合は <code>_1</code> になります。</p></div></div>
+
+    <div id="help-modal" class="modal"><div class="modal-overlay"></div><div class="modal-content"><button class="modal-close-btn">&times;</button><h2>ヘルプ：問題の作り方</h2><p>以下の形式に従って問題を作成し、テキストエリアに貼り付けてください。</p><ul class="modal-rules"><li>各問題は記号 <code>#</code> で区切ります。</li><li>問題の種類は <code>[check]</code> <code>[select]</code> <code>[enter]</code> <code>[fill]</code> の4つです。</li><li>重要度は問題の末尾に <code>_1</code> (低) 〜 <code>_3</code> (高) で指定します。(省略可)</li></ul><h4>コピーして使える問題例</h4><div class="copy-example">[check]apple@りんご_3#
+[select]日本の首都は？@選んでください_3{東京}&lt;大阪&gt;&lt;京都&gt;#
+[enter]1+1=?@2_1#
+[fill]ことわざ@犬も歩けば&lt;棒&gt;にあたる_2#</div></div></div>
     <script>
         let originalWordList = [], wordList = [], reviewList = [];
-        let currentIndex = 0, correctCount = 0, currentPassTotal = 0, isReviewPhase = false, currentScreen = 'setup';
+        let currentIndex = 0, correctCount = 0, checkOKCount = 0, checkReviewCount = 0;
+        let currentPassTotalForRate = 0, isReviewPhase = false, currentScreen = 'setup';
+        let mistakeCount = 0, fillBlankRate = 100, isCheckOnlyMode = false;
+
         const screens = { setup: document.getElementById('setup-screen'), main: document.getElementById('main-screen'), intermediate: document.getElementById('intermediate-screen'), end: document.getElementById('end-screen') };
         const views = { check: document.getElementById('check-view'), select: document.getElementById('select-view'), enter: document.getElementById('enter-view'), fill: document.getElementById('fill-view') };
-        const feedbackContainer = document.getElementById('feedback-container'), actionBtn = document.getElementById('action-btn'),
+        const feedbackContainer = document.getElementById('feedback-container'), feedbackText = document.getElementById('feedback-text'), actionBtn = document.getElementById('action-btn'),
               checkButtonContainer = document.getElementById('check-button-container'), progressBar = document.getElementById('progress-bar'),
-              progressText = document.getElementById('progress-text'), importanceDisplay = document.getElementById('importance-display');
+              progressTextEl = document.getElementById('progress-text'), importanceDisplay = document.getElementById('importance-display'),
+              mistakeCounter = document.getElementById('mistake-counter'), addToReviewBtn = document.getElementById('add-to-review-btn');
         const helpBtn = document.getElementById('help-btn'), helpModal = document.getElementById('help-modal'),
               modalOverlay = helpModal.querySelector('.modal-overlay'), modalCloseBtn = helpModal.querySelector('.modal-close-btn');
-        
+        const fillRateSlider = document.getElementById('fill-rate-slider'), fillRateValue = document.getElementById('fill-rate-value');
+        const confettiCanvas = document.getElementById('confetti-canvas');
+
         helpBtn.addEventListener('click', () => helpModal.classList.add('active'));
         modalOverlay.addEventListener('click', () => helpModal.classList.remove('active'));
         modalCloseBtn.addEventListener('click', () => helpModal.classList.remove('active'));
@@ -182,21 +234,47 @@
         document.getElementById('retry-incorrect-btn').addEventListener('click', retryIncorrect);
         document.getElementById('retry-all-btn').addEventListener('click', retryAll);
         document.getElementById('restart-completely-btn').addEventListener('click', restartGame);
-        document.getElementById('restart-btn').addEventListener('click', restartGame);
-        
-        function switchScreen(screenName) { screens[currentScreen].classList.remove('visible'); setTimeout(() => { screens[currentScreen].classList.remove('active'); currentScreen = screenName; screens[currentScreen].classList.add('active'); setTimeout(() => screens[currentScreen].classList.add('visible'), 50); }, 300); }
+        document.getElementById('end-retry-all-btn').addEventListener('click', retryAll);
+        document.getElementById('end-restart-btn').addEventListener('click', restartGame);
+        fillRateSlider.addEventListener('input', (e) => { fillRateValue.textContent = e.target.value; });
+
+        function switchScreen(screenName) {
+            screens[currentScreen].classList.remove('visible');
+            setTimeout(() => {
+                screens[currentScreen].classList.remove('active');
+                currentScreen = screenName;
+                screens[currentScreen].classList.add('active');
+
+                if (screenName === 'intermediate') {
+                    showIntermediateResults();
+                } else if (screenName === 'end') {
+                    triggerPerfectAnimation();
+                }
+
+                setTimeout(() => screens[currentScreen].classList.add('visible'), 50);
+            }, 300);
+        }
         screens['setup'].classList.add('visible');
+
         function startGame() {
             const allProblems = parseText(document.getElementById('input-text').value);
             const selectedImportance = document.querySelector('input[name="importance"]:checked').value;
             const [minImp, maxImp] = selectedImportance.split('-').map(Number);
-            const filteredProblems = allProblems.filter(p => p.importance >= minImp && p.importance <= maxImp);
+            let filteredProblems = allProblems.filter(p => p.importance >= minImp && p.importance <= maxImp);
+            if (document.getElementById('shuffle-checkbox').checked) {
+                filteredProblems.sort(() => Math.random() - 0.5);
+            }
             if (filteredProblems.length === 0) { alert('選択した重要度の問題がありません。'); return; }
             originalWordList = JSON.parse(JSON.stringify(filteredProblems));
+            mistakeCount = 0;
+            fillBlankRate = parseInt(fillRateSlider.value, 10);
             startNewPass(filteredProblems, false);
         }
         function startNewPass(problems, isReview) {
-            wordList = [...problems]; reviewList = []; currentIndex = 0; correctCount = 0; currentPassTotal = wordList.length; isReviewPhase = isReview;
+            wordList = [...problems]; reviewList = []; currentIndex = 0; correctCount = 0; checkOKCount = 0; checkReviewCount = 0;
+            currentPassTotalForRate = wordList.filter(p => p.type !== 'check').length;
+            isCheckOnlyMode = wordList.every(p => p.type === 'check');
+            isReviewPhase = isReview;
             switchScreen('main'); showNextProblem();
         }
         function retryIncorrect() { if (reviewList.length > 0) startNewPass(reviewList, true); }
@@ -212,11 +290,17 @@
             if (m = pStr.match(/^\[select\](.*?)\@(.*?)((?:<[^>]+>|{[^}]+})+)$/s)) { const [,largeText, smallTextRaw, optionsStr] = m; const {text, importance} = parseImportance(smallTextRaw); const options = []; let correctAnswer = ''; [...optionsStr.matchAll(/<([^>]+)>|{([^}]+)}/g)].forEach(o => { (o[1]) ? options.push(o[1].trim()) : (correctAnswer=o[2].trim(), options.push(correctAnswer)); }); return {type:'select', largeText:largeText.trim(), smallText:text, options, correctAnswer, importance}; }
             return null;
         }
+
         function showNextProblem() {
-            if (currentIndex >= wordList.length) { if (reviewList.length === 0) { switchScreen('end'); } else { showIntermediateResults(); } return; }
+            if (currentIndex >= wordList.length) {
+                if (reviewList.length === 0) { switchScreen('end'); } else { switchScreen('intermediate'); }
+                return;
+            }
             updateProgress();
             feedbackContainer.classList.remove('visible', 'correct', 'incorrect'); actionBtn.classList.remove('visible'); checkButtonContainer.classList.remove('active');
+            addToReviewBtn.style.display = 'none';
             Object.values(views).forEach(v => v.style.display = 'none');
+
             const problem = wordList[currentIndex];
             const reviewMark = isReviewPhase ? `<span class="review-indicator">復習</span>` : '';
             const view = views[problem.type];
@@ -225,12 +309,17 @@
             largeTextContent.appendChild(textSpan);
             if (isReviewPhase) largeTextContent.insertAdjacentHTML('beforeend', reviewMark);
             if (view.querySelector('.small-text')) view.querySelector('.small-text').textContent = problem.smallText || '';
+            
+            view.classList.add('is-entering');
             view.style.display = 'block';
+            requestAnimationFrame(() => { view.classList.remove('is-entering'); });
+
             if (problem.type === 'check') setupCheck();
             else if (problem.type === 'select') setupSelect(problem);
             else if (problem.type === 'enter') setupEnter(problem);
             else if (problem.type === 'fill') setupFill(problem);
         }
+
         function setupCheck() {
             checkButtonContainer.classList.add('active');
             document.getElementById('ok-btn').onclick = () => handleAnswerFeedback(true);
@@ -244,38 +333,93 @@
             });
         }
         function setupEnter(problem) {
-            const input = document.getElementById('enter-input'); input.value = ''; input.disabled = false; 
+            const input = document.getElementById('enter-input'); input.value = ''; input.disabled = false;
             const handleSubmit = () => { input.disabled = true; handleAnswerFeedback(input.value.trim().toLowerCase() === problem.correctAnswer.trim().toLowerCase(), problem.correctAnswer); };
             actionBtn.textContent = '回答'; actionBtn.onclick = handleSubmit; actionBtn.classList.add('visible');
             input.onkeydown = (e) => { if (e.key === 'Enter') handleSubmit(); };
         }
         function setupFill(problem) {
             const contentDiv = document.getElementById('fill-content'); contentDiv.innerHTML = '';
-            problem.questionParts.forEach((part, index) => { contentDiv.appendChild(document.createTextNode(part)); if (index < problem.answers.length) contentDiv.appendChild(document.createElement('input')).className = 'fill-input'; });
-            const handleSubmit = () => { const inputs = [...contentDiv.querySelectorAll('.fill-input')]; const userAnswers = inputs.map(i => i.value.trim().toLowerCase()); const correctAnswers = problem.answers.map(a => a.trim().toLowerCase()); inputs.forEach(i => i.disabled = true); handleAnswerFeedback(userAnswers.length === correctAnswers.length && userAnswers.every((val, i) => val === correctAnswers[i]), problem.answers.join(', ')); };
+            const totalBlanks = problem.answers.length;
+            const blanksToShow = Math.round(totalBlanks * (fillBlankRate / 100));
+            const blankIndices = new Set([...Array(totalBlanks).keys()].sort(() => 0.5 - Math.random()).slice(0, blanksToShow));
+
+            problem.questionParts.forEach((part, index) => {
+                contentDiv.appendChild(document.createTextNode(part));
+                if (index < totalBlanks) {
+                    if (blankIndices.has(index)) {
+                        const input = document.createElement('input'); input.className = 'fill-input'; input.dataset.answerIndex = index; contentDiv.appendChild(input);
+                    } else {
+                        const prefilled = document.createElement('span'); prefilled.className = 'fill-prefilled'; prefilled.textContent = problem.answers[index]; contentDiv.appendChild(prefilled);
+                    }
+                }
+            });
+            const handleSubmit = () => {
+                const inputs = [...contentDiv.querySelectorAll('.fill-input')];
+                let allCorrect = true;
+                inputs.forEach(input => {
+                    const answerIndex = parseInt(input.dataset.answerIndex, 10);
+                    const isInputCorrect = input.value.trim().toLowerCase() === problem.answers[answerIndex].trim().toLowerCase();
+                    input.classList.add(isInputCorrect ? 'correct' : 'incorrect');
+                    if (!isInputCorrect) allCorrect = false;
+                });
+                inputs.forEach(i => i.disabled = true);
+                handleAnswerFeedback(allCorrect, problem.answers.join(', '));
+            };
             actionBtn.textContent = '回答'; actionBtn.onclick = handleSubmit; actionBtn.classList.add('visible');
         }
         function handleAnswerFeedback(isCorrect, correctAnswerText) {
-            if (isCorrect) correctCount++; else reviewList.push(wordList[currentIndex]);
-            if (wordList[currentIndex].type !== 'check') {
-                if (isCorrect) { feedbackContainer.textContent = '正解！'; feedbackContainer.classList.add('correct'); }
-                else { feedbackContainer.textContent = `不正解　正しい解答: ${correctAnswerText}`; feedbackContainer.classList.add('incorrect'); }
-                feedbackContainer.classList.add('visible');
+            const problem = wordList[currentIndex];
+            if (problem.type === 'check') {
+                isCorrect ? checkOKCount++ : checkReviewCount++;
+            } else {
+                if(isCorrect) correctCount++;
+            }
+            if (!isCorrect) {
+                if(!reviewList.includes(problem)) reviewList.push(problem);
+                if(problem.type !== 'check') mistakeCount++;
+            }
+            if (problem.type !== 'check') {
+                feedbackText.textContent = isCorrect ? '正解！' : `不正解　正しい解答: ${correctAnswerText}`;
+                feedbackContainer.classList.add(isCorrect ? 'correct' : 'incorrect', 'visible');
+                addToReviewBtn.style.display = 'block';
+                const isInReviewList = reviewList.includes(problem);
+                addToReviewBtn.disabled = isInReviewList;
+                addToReviewBtn.textContent = isInReviewList ? '追加済み' : '復習リストに追加';
+                addToReviewBtn.onclick = () => {
+                    if (!reviewList.includes(problem)) {
+                        reviewList.push(problem);
+                        addToReviewBtn.disabled = true;
+                        addToReviewBtn.textContent = '追加済み';
+                    }
+                };
                 actionBtn.textContent = '次へ'; actionBtn.onclick = moveToNextProblem; actionBtn.classList.add('visible');
             } else { moveToNextProblem(); }
+            updateProgress();
         }
         function showIntermediateResults() {
-            switchScreen('intermediate');
-            const percentage = currentPassTotal > 0 ? (correctCount / currentPassTotal * 100) : 0;
+            let percentage, detailsText;
+            if (isCheckOnlyMode) {
+                const total = checkOKCount + checkReviewCount;
+                percentage = total > 0 ? (checkOKCount / total * 100) : 100;
+                detailsText = "理解度";
+            } else {
+                percentage = currentPassTotalForRate > 0 ? (correctCount / currentPassTotalForRate * 100) : 100;
+                detailsText = `${correctCount} / ${currentPassTotalForRate} 問 正解`;
+            }
             const visualEl = screens.intermediate.querySelector('.results-visual');
-            document.getElementById('results-percentage').textContent = `${percentage.toFixed(0)}%`;
-            document.getElementById('results-details').textContent = `${correctCount} / ${currentPassTotal} 問 正解`;
-            visualEl.style.setProperty('--percentage', percentage);
-            let color = 'var(--danger-color)';
-            if (percentage >= 80) color = 'var(--success-color)';
-            else if (percentage >= 50) color = 'var(--warning-color)';
-            visualEl.style.setProperty('--progress-color', color);
-            document.getElementById('results-percentage').style.color = color;
+            const percentageEl = document.getElementById('results-percentage');
+            document.getElementById('results-details').textContent = detailsText;
+            
+            const rootStyles = getComputedStyle(document.documentElement);
+            const startColorHex = rootStyles.getPropertyValue('--danger-color').trim();
+            let endColorHex;
+            if (percentage >= 80) endColorHex = rootStyles.getPropertyValue('--success-color').trim();
+            else if (percentage >= 50) endColorHex = rootStyles.getPropertyValue('--warning-color').trim();
+            else endColorHex = startColorHex;
+
+            triggerMeterAnimation(percentage, visualEl, percentageEl, startColorHex, endColorHex);
+
             document.getElementById('retry-incorrect-btn').disabled = (reviewList.length === 0);
             
             const listEl = document.getElementById('incorrect-list');
@@ -285,12 +429,7 @@
                 .forEach(problem => {
                     const li = document.createElement('li');
                     let correctAnswerText = '';
-                    switch (problem.type) {
-                        case 'check': correctAnswerText = problem.smallText; break;
-                        case 'enter':
-                        case 'select': correctAnswerText = problem.correctAnswer; break;
-                        case 'fill': correctAnswerText = problem.answers.join(', '); break;
-                    }
+                    switch (problem.type) { case 'check': correctAnswerText = problem.smallText; break; case 'enter': case 'select': correctAnswerText = problem.correctAnswer; break; case 'fill': correctAnswerText = problem.answers.join(', '); break; }
                     const importanceStars = '★'.repeat(problem.importance) + '☆'.repeat(3 - problem.importance);
                     li.innerHTML = `<div class="incorrect-item-content"><span class="incorrect-item-importance">${importanceStars}</span><span class="incorrect-item-text">${problem.largeText}</span></div><span class="incorrect-item-answer">${correctAnswerText}</span>`;
                     listEl.appendChild(li);
@@ -298,11 +437,153 @@
         }
         function moveToNextProblem() { currentIndex++; showNextProblem(); }
         function updateProgress() {
-            const percentage = currentPassTotal > 0 ? ((currentIndex) / currentPassTotal) * 100 : 0;
+            const total = wordList.length;
+            const percentage = total > 0 ? ((currentIndex) / total) * 100 : 0;
             progressBar.style.width = `${percentage}%`;
-            progressText.textContent = `問題 ${currentIndex + 1} / ${currentPassTotal}`;
-            const problem = wordList[currentIndex];
-            importanceDisplay.textContent = '★'.repeat(problem.importance) + '☆'.repeat(3 - problem.importance);
+            progressTextEl.textContent = `問題 ${currentIndex + 1} / ${total}`;
+            if (mistakeCount > 0) { mistakeCounter.textContent = `✗ ${mistakeCount}`; mistakeCounter.classList.add('visible'); } else { mistakeCounter.classList.remove('visible'); }
+            if (currentIndex < total) { const problem = wordList[currentIndex]; importanceDisplay.textContent = '★'.repeat(problem.importance) + '☆'.repeat(3 - problem.importance); }
+        }
+
+        const easeInOutCubic = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : null;
+        }
+
+        function rgbToHsv(r, g, b) {
+            r /= 255, g /= 255, b /= 255;
+            let max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, v = max;
+            let d = max - min;
+            s = max == 0 ? 0 : d / max;
+            if (max == min) { h = 0; } 
+            else {
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+            return { h: h * 360, s: s, v: v };
+        }
+
+        function hsvToRgb(h, s, v) {
+            let r, g, b;
+            let i = Math.floor(h / 60) % 6;
+            let f = h / 60 - i;
+            let p = v * (1 - s);
+            let q = v * (1 - f * s);
+            let t = v * (1 - (1 - f) * s);
+            switch (i) {
+                case 0: r = v, g = t, b = p; break;
+                case 1: r = q, g = v, b = p; break;
+                case 2: r = p, g = v, b = t; break;
+                case 3: r = p, g = q, b = v; break;
+                case 4: r = t, g = p, b = v; break;
+                case 5: r = v, g = p, b = q; break;
+            }
+            return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
+        }
+
+        function triggerMeterAnimation(targetPercentage, visualEl, percentageEl, startColorHex, endColorHex) {
+            visualEl.style.setProperty('--percentage', 0);
+            percentageEl.textContent = '0%';
+            
+            const startRgb = hexToRgb(startColorHex);
+            const endRgb = hexToRgb(endColorHex);
+            if (!startRgb || !endRgb) return;
+
+            const startHsv = rgbToHsv(startRgb.r, startRgb.g, startRgb.b);
+            const endHsv = rgbToHsv(endRgb.r, endRgb.g, endRgb.b);
+
+            const duration = 1200;
+            let startTime = null;
+
+            function animationStep(timestamp) {
+                if (!startTime) startTime = timestamp;
+                const elapsedTime = timestamp - startTime;
+                const progress = Math.min(elapsedTime / duration, 1);
+                const easedProgress = easeInOutCubic(progress);
+
+                const displayPercentage = targetPercentage * easedProgress;
+
+                const h = startHsv.h + easedProgress * (endHsv.h - startHsv.h);
+                const s = startHsv.s + easedProgress * (endHsv.s - startHsv.s);
+                const v = startHsv.v + easedProgress * (endHsv.v - startHsv.v);
+                
+                const interpolatedRgb = hsvToRgb(h, s, v);
+                const interpolatedColor = `rgb(${interpolatedRgb.r}, ${interpolatedRgb.g}, ${interpolatedRgb.b})`;
+
+                visualEl.style.setProperty('--percentage', displayPercentage);
+                visualEl.style.setProperty('--progress-color', interpolatedColor);
+                percentageEl.textContent = `${Math.floor(displayPercentage)}%`;
+                percentageEl.style.color = interpolatedColor;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animationStep);
+                }
+            }
+            requestAnimationFrame(animationStep);
+        }
+
+        function triggerPerfectAnimation() {
+            const endScreen = screens.end;
+            const visualEl = endScreen.querySelector('.results-visual');
+            const percentageEl = endScreen.querySelector('#end-percentage');
+            endScreen.classList.remove('is-animating');
+            percentageEl.textContent = '0%';
+            visualEl.style.setProperty('--percentage', 0);
+
+            setTimeout(() => {
+                endScreen.classList.add('is-animating');
+                const duration = 1200;
+                const targetPercentage = 100;
+                let startTime = null;
+
+                function animationStep(timestamp) {
+                    if (!startTime) startTime = timestamp;
+                    const elapsedTime = timestamp - startTime;
+                    const progress = Math.min(elapsedTime / duration, 1);
+                    const easedProgress = easeInOutCubic(progress);
+
+                    const displayPercentage = targetPercentage * easedProgress;
+
+                    visualEl.style.setProperty('--percentage', displayPercentage);
+                    percentageEl.textContent = `${Math.floor(displayPercentage)}%`;
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(animationStep);
+                    } else {
+                        triggerConfetti();
+                    }
+                }
+                requestAnimationFrame(animationStep);
+            }, 350);
+        }
+        function triggerConfetti() {
+            const ctx = confettiCanvas.getContext('2d');
+            const W = confettiCanvas.offsetWidth, H = confettiCanvas.offsetHeight;
+            confettiCanvas.width = W; confettiCanvas.height = H;
+            const particles = [], particleCount = 150;
+            const colors = ["#007aff", "#34c759", "#ff9500", "#ff3b30", "#af52de", "#5856d6"];
+            for (let i = 0; i < particleCount; i++) { particles.push({ x: Math.random() * W, y: Math.random() * H - H, w: Math.random() * 10 + 5, h: Math.random() * 10 + 5, vx: (Math.random() - 0.5) * 10, vy: Math.random() * 5 + 2, angle: Math.random() * 360, color: colors[Math.floor(Math.random() * colors.length)] }); }
+            let animationFrameId;
+            function draw() {
+                ctx.clearRect(0, 0, W, H);
+                for (let i = 0; i < particles.length; i++) {
+                    const p = particles[i];
+                    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.angle * Math.PI / 180);
+                    ctx.fillStyle = p.color; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); ctx.restore();
+                    p.y += p.vy; p.x += p.vx; p.angle += p.vx / 2;
+                    if (p.y > H) { particles.splice(i, 1); i--; }
+                }
+                if (particles.length > 0) animationFrameId = requestAnimationFrame(draw);
+                else { ctx.clearRect(0, 0, W, H); cancelAnimationFrame(animationFrameId); }
+            }
+            draw();
         }
     </script>
 </body>
