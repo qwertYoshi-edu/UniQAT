@@ -27,20 +27,19 @@
         html { font-size: 16px; }
 
         body {
-            font-family: var(--font-family); margin: 0; padding: 16px; background-color: var(--light-bg);
+            font-family: var(--font-family); margin: 0; padding: 16px; background-color: var(--card-bg);
             color: var(--text-color); text-align: center; display: flex; justify-content: center;
-            align-items: center; min-height: calc(100vh - 32px); box-sizing: border-box;
+            align-items: flex-start; min-height: calc(100vh - 32px); box-sizing: border-box;
         }
 
         .container {
-            width: 100%; max-width: 1000px; height: 70vh; max-height: 700px;
-            padding: 2.2rem 1.8rem; background-color: var(--card-bg); border-radius: 14px;
-            box-shadow: 0 13px 44px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column; overflow: hidden;
+            width: 100%; max-width: 1000px;
+            display: flex; flex-direction: column;
             position: relative;
         }
-        #confetti-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2000; }
+        #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2000; }
 
-        .screen { display: none; height: 100%; flex-direction: column; opacity: 0; transition: opacity 0.3s ease-in-out; }
+        .screen { display: none; width: 100%; min-height: 70vh; flex-direction: column; opacity: 0; transition: opacity 0.3s ease-in-out; }
         .screen.active { display: flex; }
         .screen.visible { opacity: 1; }
 
@@ -48,8 +47,8 @@
         .centered-content h1 { font-size: 2.4rem; margin-top: 0; margin-bottom: 0.5rem; }
         .centered-content .description-wrapper { display: flex; align-items: center; justify-content: center; gap: 0.8rem; }
         .centered-content p { font-size: 1.2rem; color: var(--secondary-color); max-width: 660px; margin: 0 auto 1.8rem; }
-        #input-text { width: 100%; flex-grow: 1; padding: 1.1rem; margin: 1.1rem 0; border: 1px solid var(--border-color);
-            border-radius: 8px; font-size: 1.1rem; resize: none; box-sizing: border-box; font-family: var(--font-family); }
+        #input-text { width: 100%; height: 25vh; padding: 1.1rem; margin: 1.1rem 0; border: 1px solid var(--border-color);
+            border-radius: 8px; font-size: 1.1rem; resize: vertical; box-sizing: border-box; font-family: var(--font-family); }
         
         .settings-row {
             display: grid;
@@ -72,7 +71,7 @@
             margin-top: 22px;
         }
 
-        .results-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: minmax(0, 1fr); gap: 2.2rem; height: 100%; }
+        .results-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: minmax(0, 1fr); gap: 2.2rem; height: 100%; width: 100%;}
         .incorrect-list-container { height: 100%; display: flex; flex-direction: column; border-right: 1px solid var(--border-color); padding-right: 2.2rem; min-height: 0; }
         .incorrect-list-container h3 { margin: 0 0 1.1rem 0; text-align: left; flex-shrink: 0; }
         #incorrect-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; text-align: left; flex-grow: 1; }
@@ -99,7 +98,7 @@
         #end-screen .results-options { margin: 0 auto; max-width: 330px; width: 100%; }
 
         #main-screen { justify-content: space-between; }
-        #progress-area { flex-shrink: 0; }
+        #progress-area { flex-shrink: 0; padding-bottom: 1rem; }
         #content-area { flex-grow: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; overflow-y: auto; padding: 1.1rem 0; width: 100%; }
         #action-area { flex-shrink: 0; min-height: 100px; display: flex; flex-direction: column; justify-content: flex-end; padding-top: 1.1rem; }
 
@@ -170,7 +169,10 @@
         .modal-rules li { position: relative; padding-left: 24px; margin-bottom: 1.8rem; }
         .modal-rules li::before { content: '▶'; position: absolute; left: 0; top: 1px; color: var(--accent-color); }
         .modal-rules code { background-color: var(--light-bg); padding: 3px 6px; border-radius: 4px; font-size: 1em; color: var(--accent-color); font-weight: 600;}
-        .copy-example { background-color: var(--light-bg); border: 1px solid var(--border-color); padding: 1.1rem; border-radius: 6px; white-space: pre-wrap; word-break: break-all; font-family: monospace; font-size: 1rem; line-height: 1.6; }
+        .copy-example, #copy-textarea { background-color: var(--light-bg); border: 1px solid var(--border-color); padding: 1.1rem; border-radius: 6px; font-family: monospace; font-size: 1rem; line-height: 1.6; }
+        .copy-example { white-space: pre-wrap; word-break: break-all; }
+        #copy-textarea { width: 100%; height: 250px; resize: vertical; box-sizing: border-box; margin-top: 1rem; }
+
     </style>
 </head>
 <body>
@@ -197,7 +199,7 @@
         </div>
 
         <div id="main-screen" class="screen"><div id="progress-area"><div id="progress-bar-container"><div id="progress-bar"></div></div><div class="progress-info"><div class="progress-info-left"><div id="progress-text"></div><div id="mistake-counter"></div></div><div id="importance-display"></div></div><div id="mode-indicator"></div></div><div id="content-area"><div id="check-view" class="problem-view"><div class="large-text"></div><div class="small-text"></div></div><div id="select-view" class="problem-view"><div class="large-text"></div><div class="small-text"></div><div id="select-options-container"></div></div><div id="enter-view" class="problem-view"><div class="large-text"></div><div class="input-form"><input type="text" id="enter-input" class="text-input" placeholder="答えを入力"></div></div><div id="fill-view" class="problem-view"><div class="large-text"></div><div id="fill-content"></div><div class="input-form"></div></div></div><div id="action-area"><div id="feedback-container"><span id="feedback-text"></span><button id="add-to-review-btn">復習リストに追加</button></div><div id="check-button-container" class="button-container input-form"><button id="review-btn" class="btn-secondary">後でもう一度確認</button><button id="ok-btn" class="btn-success">OK</button></div><button id="action-btn" class="btn-primary"></button></div></div>
-        <div id="intermediate-screen" class="screen"><div class="results-grid"><div class="incorrect-list-container"><h3>間違えた問題</h3><ul id="incorrect-list"></ul></div><div class="results-summary-container"><h1>お疲れ様でした！</h1><div class="results-summary"><div class="results-visual"><span id="results-percentage"></span></div><div id="results-details"></div></div><div class="results-options"><button id="retry-incorrect-btn" class="btn-primary">間違えた問題を復習</button><button id="retry-all-btn" class="btn-secondary">もう一度すべて解く</button><button id="retry-final-check-btn" class="btn-secondary">直前チェック (全問題)</button><button id="restart-completely-btn" class="btn-secondary">新しい問題で始める</button></div></div></div></div>
+        <div id="intermediate-screen" class="screen"><div class="results-grid"><div class="incorrect-list-container"><h3>間違えた問題</h3><ul id="incorrect-list"></ul></div><div class="results-summary-container"><h1>お疲れ様でした！</h1><div class="results-summary"><div class="results-visual"><span id="results-percentage"></span></div><div id="results-details"></div></div><div class="results-options"><button id="retry-incorrect-btn" class="btn-primary">間違えた問題を復習</button><button id="copy-incorrect-btn" class="btn-secondary">誤答問題をコピー</button><button id="retry-all-btn" class="btn-secondary">もう一度すべて解く</button><button id="retry-final-check-btn" class="btn-secondary">直前チェック (全問題)</button><button id="restart-completely-btn" class="btn-secondary">新しい問題で始める</button></div></div></div></div>
         
         <div id="end-screen" class="screen centered-content">
             <h1>パーフェクト！</h1>
@@ -215,9 +217,12 @@
     </div>
 
     <div id="help-modal" class="modal"><div class="modal-overlay"></div><div class="modal-content"><button class="modal-close-btn">&times;</button><h2>ヘルプ：問題の作り方</h2><p>以下の形式に従って問題を作成し、テキストエリアに貼り付けてください。</p><ul class="modal-rules"><li>各問題は記号 <code>#</code> で区切ります。</li><li>問題の種類は <code>[check]</code> <code>[select]</code> <code>[enter]</code> <code>[fill]</code> の4つです。</li><li>重要度は問題の末尾に <code>_1</code> (低) 〜 <code>_3</code> (高) で指定します。(省略可)</li></ul><h4>コピーして使える問題例</h4><div class="copy-example">[check]apple@りんご_3#
-[select]日本の首都は？@選んでください_3{東京}&lt;大阪&gt;&lt;京都&gt;#
+[select]日本の首都は？@選んでください{東京}&lt;大阪&gt;&lt;京都&gt;_3#
 [enter]1+1=?@2_1#
 [fill]ことわざ@犬も歩けば&lt;棒&gt;にあたる_2#</div></div></div>
+    
+    <div id="copy-modal" class="modal"><div class="modal-overlay"></div><div class="modal-content"><button class="modal-close-btn">&times;</button><h2>誤答問題リスト</h2><p>以下のテキストをコピーして、次回の学習に活用してください。</p><textarea id="copy-textarea" readonly></textarea></div></div>
+
     <script>
         let originalWordList = [], wordList = [], reviewList = [];
         let currentIndex = 0, correctCount = 0, checkOKCount = 0, checkReviewCount = 0;
@@ -231,14 +236,28 @@
               progressTextEl = document.getElementById('progress-text'), importanceDisplay = document.getElementById('importance-display'),
               mistakeCounter = document.getElementById('mistake-counter'), addToReviewBtn = document.getElementById('add-to-review-btn'),
               modeIndicator = document.getElementById('mode-indicator');
-        const helpBtn = document.getElementById('help-btn'), helpModal = document.getElementById('help-modal'),
-              modalOverlay = helpModal.querySelector('.modal-overlay'), modalCloseBtn = helpModal.querySelector('.modal-close-btn');
+        const helpBtn = document.getElementById('help-btn'), helpModal = document.getElementById('help-modal');
+        const copyIncorrectBtn = document.getElementById('copy-incorrect-btn'), copyModal = document.getElementById('copy-modal'), copyTextarea = document.getElementById('copy-textarea');
         const fillRateSlider = document.getElementById('fill-rate-slider'), fillRateValue = document.getElementById('fill-rate-value');
         const confettiCanvas = document.getElementById('confetti-canvas');
 
+        function setupModal(modal) {
+            const overlay = modal.querySelector('.modal-overlay');
+            const closeBtn = modal.querySelector('.modal-close-btn');
+            overlay.addEventListener('click', () => modal.classList.remove('active'));
+            closeBtn.addEventListener('click', () => modal.classList.remove('active'));
+        }
+        
         helpBtn.addEventListener('click', () => helpModal.classList.add('active'));
-        modalOverlay.addEventListener('click', () => helpModal.classList.remove('active'));
-        modalCloseBtn.addEventListener('click', () => helpModal.classList.remove('active'));
+        setupModal(helpModal);
+        copyIncorrectBtn.addEventListener('click', () => {
+            const incorrectProblemsText = reviewList.map(reconstructProblemString).join('#\n');
+            copyTextarea.value = incorrectProblemsText;
+            copyModal.classList.add('active');
+        });
+        setupModal(copyModal);
+        copyTextarea.addEventListener('click', function() { this.select(); });
+
         document.getElementById('start-btn').addEventListener('click', () => startGame(false));
         document.getElementById('final-check-btn').addEventListener('click', () => startGame(true));
         document.getElementById('retry-incorrect-btn').addEventListener('click', retryIncorrect);
@@ -296,23 +315,37 @@
         function parseImportance(text) { const match = text.match(/_([1-3])$/); return match ? { text: text.substring(0, text.length - 2).trim(), importance: parseInt(match[1], 10) } : { text: text.trim(), importance: 1 }; }
         function parseText(text) { return text.trim().split('#').map(p => p.trim()).filter(Boolean).map(parseProblem).filter(Boolean); }
         function parseProblem(pStr) {
+            const { text: coreStr, importance } = parseImportance(pStr);
             let m;
-            if (m = pStr.match(/^\[check\](.*?)\@(.*)$/s)) { const {text, importance} = parseImportance(m[2]); return {type:'check', largeText:m[1].trim(), smallText:text, importance}; }
-            if (m = pStr.match(/^\[enter\](.*?)\@(.*)$/s)) { const {text, importance} = parseImportance(m[2]); return {type:'enter', largeText:m[1].trim(), correctAnswer:text, importance}; }
-            if (m = pStr.match(/^\[fill\](.*?)\@(.*)$/s)) { const {text, importance} = parseImportance(m[2]); const answers = []; const parts = []; let lastIndex = 0; for (const fm of text.matchAll(/<([^>]+)>/g)) { parts.push(text.substring(lastIndex, fm.index)); answers.push(fm[1].trim()); lastIndex = fm.index + fm[0].length; } parts.push(text.substring(lastIndex)); return {type:'fill', largeText:m[1].trim(), questionParts:parts, answers, importance}; }
-            if (m = pStr.match(/^\[select\](.*?)\@(.*?)((?:<[^>]+>|{[^}]+})+)$/s)) { const [,largeText, smallTextRaw, optionsStr] = m; const {text, importance} = parseImportance(smallTextRaw); const options = []; let correctAnswer = ''; [...optionsStr.matchAll(/<([^>]+)>|{([^}]+)}/g)].forEach(o => { (o[1]) ? options.push(o[1].trim()) : (correctAnswer=o[2].trim(), options.push(correctAnswer)); }); return {type:'select', largeText:largeText.trim(), smallText:text, options, correctAnswer, importance}; }
+            if (m = coreStr.match(/^\[check\](.*?)\@(.*)$/s)) { return {type:'check', largeText:m[1].trim(), smallText:m[2].trim(), importance}; }
+            if (m = coreStr.match(/^\[enter\](.*?)\@(.*)$/s)) { return {type:'enter', largeText:m[1].trim(), correctAnswer:m[2].trim(), importance}; }
+            if (m = coreStr.match(/^\[fill\](.*?)\@(.*)$/s)) { const text = m[2]; const answers = []; const parts = []; let lastIndex = 0; for (const fm of text.matchAll(/<([^>]+)>/g)) { parts.push(text.substring(lastIndex, fm.index)); answers.push(fm[1].trim()); lastIndex = fm.index + fm[0].length; } parts.push(text.substring(lastIndex)); return {type:'fill', largeText:m[1].trim(), questionParts:parts, answers, importance}; }
+            if (m = coreStr.match(/^\[select\](.*?)\@(.*?)((?:<[^>]+>|{[^}]+})+)$/s)) { const [,largeText, smallText, optionsStr] = m; const options = []; let correctAnswer = ''; [...optionsStr.matchAll(/<([^>]+)>|{([^}]+)}/g)].forEach(o => { (o[1]) ? options.push(o[1].trim()) : (correctAnswer=o[2].trim(), options.push(correctAnswer)); }); return {type:'select', largeText:largeText.trim(), smallText:smallText.trim(), options, correctAnswer, importance}; }
             return null;
         }
         
+        function reconstructProblemString(p) {
+            let coreStr = '';
+            switch (p.type) {
+                case 'check': coreStr = `[check]${p.largeText}@${p.smallText}`; break;
+                case 'enter': coreStr = `[enter]${p.largeText}@${p.correctAnswer}`; break;
+                case 'select':
+                    const optionsStr = p.options.map(opt => (opt === p.correctAnswer ? `{${opt}}` : `<${opt}>`)).sort().join('');
+                    coreStr = `[select]${p.largeText}@${p.smallText}${optionsStr}`;
+                    break;
+                case 'fill':
+                    const answerPart = p.questionParts.map((part, i) => part + (i < p.answers.length ? `<${p.answers[i]}>` : '')).join('');
+                    coreStr = `[fill]${p.largeText}@${answerPart}`;
+                    break;
+            }
+            return `${coreStr}_${p.importance}`;
+        }
+
         function normalizeAnswer(str) {
             if (typeof str !== 'string') return '';
             const trimmedStr = str.trim().replace(/\.\.\./g, '…');
             if (trimmedStr.includes('、')) {
-                return trimmedStr.split('、')
-                               .map(part => part.trim())
-                               .filter(part => part.length > 0)
-                               .sort()
-                               .join('、');
+                return trimmedStr.split('、').map(part => part.trim()).filter(part => part.length > 0).sort().join('、');
             }
             return trimmedStr;
         }
@@ -343,17 +376,9 @@
             if (isFinalCheckMode) {
                 let answerHtml = '';
                 switch(problem.type) {
-                    case 'select':
-                    case 'enter':
-                        answerHtml = problem.correctAnswer;
-                        break;
-                    case 'fill':
-                        answerHtml = problem.questionParts.map((part, index) => {
-                            return part + (index < problem.answers.length ? `<span class="final-check-answer">${problem.answers[index]}</span>` : '');
-                        }).join('');
-                        break;
-                    default: // check
-                        answerHtml = problem.smallText || '';
+                    case 'select': case 'enter': answerHtml = problem.correctAnswer; break;
+                    case 'fill': answerHtml = problem.questionParts.map((part, index) => part + (index < problem.answers.length ? `<span class="final-check-answer">${problem.answers[index]}</span>` : '')).join(''); break;
+                    default: answerHtml = problem.smallText || '';
                 }
                 view.querySelector('.small-text').innerHTML = answerHtml;
                 setupCheck();
@@ -380,11 +405,7 @@
         }
         function setupEnter(problem) {
             const input = document.getElementById('enter-input'); input.value = ''; input.disabled = false;
-            const handleSubmit = () => {
-                input.disabled = true;
-                const isCorrect = normalizeAnswer(input.value).toLowerCase() === normalizeAnswer(problem.correctAnswer).toLowerCase();
-                handleAnswerFeedback(isCorrect, problem.correctAnswer);
-            };
+            const handleSubmit = () => { input.disabled = true; const isCorrect = normalizeAnswer(input.value).toLowerCase() === normalizeAnswer(problem.correctAnswer).toLowerCase(); handleAnswerFeedback(isCorrect, problem.correctAnswer); };
             actionBtn.textContent = '回答'; actionBtn.onclick = handleSubmit; actionBtn.classList.add('visible');
             input.onkeydown = (e) => { if (e.key === 'Enter') handleSubmit(); };
         }
@@ -405,26 +426,16 @@
                 }
             });
             const handleSubmit = () => {
-                const inputs = [...contentDiv.querySelectorAll('.fill-input')];
-                let allCorrect = true;
-                inputs.forEach(input => {
-                    const answerIndex = parseInt(input.dataset.answerIndex, 10);
-                    const isInputCorrect = normalizeAnswer(input.value).toLowerCase() === normalizeAnswer(problem.answers[answerIndex]).toLowerCase();
-                    input.classList.add(isInputCorrect ? 'correct' : 'incorrect');
-                    if (!isInputCorrect) allCorrect = false;
-                });
-                inputs.forEach(i => i.disabled = true);
-                handleAnswerFeedback(allCorrect, problem.answers.join(', '));
+                const inputs = [...contentDiv.querySelectorAll('.fill-input')]; let allCorrect = true;
+                inputs.forEach(input => { const answerIndex = parseInt(input.dataset.answerIndex, 10); const isInputCorrect = normalizeAnswer(input.value).toLowerCase() === normalizeAnswer(problem.answers[answerIndex]).toLowerCase(); input.classList.add(isInputCorrect ? 'correct' : 'incorrect'); if (!isInputCorrect) allCorrect = false; });
+                inputs.forEach(i => i.disabled = true); handleAnswerFeedback(allCorrect, problem.answers.join(', '));
             };
             actionBtn.textContent = '回答'; actionBtn.onclick = handleSubmit; actionBtn.classList.add('visible');
         }
         function handleAnswerFeedback(isCorrect, correctAnswerText) {
             const problem = wordList[currentIndex];
-            if (problem.type === 'check' || isFinalCheckMode) {
-                isCorrect ? checkOKCount++ : checkReviewCount++;
-            } else {
-                if(isCorrect) correctCount++;
-            }
+            if (problem.type === 'check' || isFinalCheckMode) { isCorrect ? checkOKCount++ : checkReviewCount++; } 
+            else { if(isCorrect) correctCount++; }
             if (!isCorrect) {
                 if(!reviewList.includes(problem)) reviewList.push(problem);
                 if(problem.type !== 'check' && !isFinalCheckMode) mistakeCount++;
@@ -432,17 +443,9 @@
             if (problem.type !== 'check' && !isFinalCheckMode) {
                 feedbackText.textContent = isCorrect ? '正解！' : `不正解　正しい解答: ${correctAnswerText}`;
                 feedbackContainer.classList.add(isCorrect ? 'correct' : 'incorrect', 'visible');
-                addToReviewBtn.style.display = 'block';
-                const isInReviewList = reviewList.includes(problem);
-                addToReviewBtn.disabled = isInReviewList;
+                addToReviewBtn.style.display = 'block'; const isInReviewList = reviewList.includes(problem); addToReviewBtn.disabled = isInReviewList;
                 addToReviewBtn.textContent = isInReviewList ? '追加済み' : '復習リストに追加';
-                addToReviewBtn.onclick = () => {
-                    if (!reviewList.includes(problem)) {
-                        reviewList.push(problem);
-                        addToReviewBtn.disabled = true;
-                        addToReviewBtn.textContent = '追加済み';
-                    }
-                };
+                addToReviewBtn.onclick = () => { if (!reviewList.includes(problem)) { reviewList.push(problem); addToReviewBtn.disabled = true; addToReviewBtn.textContent = '追加済み'; } };
                 actionBtn.textContent = '次へ'; actionBtn.onclick = moveToNextProblem; actionBtn.classList.add('visible');
             } else { moveToNextProblem(); }
             updateProgress();
@@ -451,8 +454,7 @@
             let percentage, detailsText;
             if (isCheckOnlyMode) {
                 const total = checkOKCount + checkReviewCount;
-                percentage = total > 0 ? (checkOKCount / total * 100) : 100;
-                detailsText = "理解度";
+                percentage = total > 0 ? (checkOKCount / total * 100) : 100; detailsText = "理解度";
             } else {
                 percentage = currentPassTotalForRate > 0 ? (correctCount / currentPassTotalForRate * 100) : 100;
                 detailsText = `${correctCount} / ${currentPassTotalForRate} 問 正解`;
@@ -470,20 +472,20 @@
 
             triggerMeterAnimation(percentage, visualEl, percentageEl, startColorHex, endColorHex);
 
-            document.getElementById('retry-incorrect-btn').disabled = (reviewList.length === 0);
+            const hasIncorrect = reviewList.length > 0;
+            document.getElementById('retry-incorrect-btn').disabled = !hasIncorrect;
+            document.getElementById('copy-incorrect-btn').disabled = !hasIncorrect;
             
             const listEl = document.getElementById('incorrect-list');
             listEl.innerHTML = '';
-            reviewList
-                .sort((a, b) => b.importance - a.importance)
-                .forEach(problem => {
+            reviewList.sort((a, b) => b.importance - a.importance).forEach(problem => {
                     const li = document.createElement('li');
                     let correctAnswerText = '';
                     switch (problem.type) { case 'check': correctAnswerText = problem.smallText; break; case 'enter': case 'select': correctAnswerText = problem.correctAnswer; break; case 'fill': correctAnswerText = problem.answers.join(', '); break; }
                     const importanceStars = '★'.repeat(problem.importance) + '☆'.repeat(3 - problem.importance);
                     li.innerHTML = `<div class="incorrect-item-content"><span class="incorrect-item-importance">${importanceStars}</span><span class="incorrect-item-text">${problem.largeText}</span></div><span class="incorrect-item-answer">${correctAnswerText}</span>`;
                     listEl.appendChild(li);
-                });
+            });
         }
         function moveToNextProblem() { currentIndex++; showNextProblem(); }
         function updateProgress() {
@@ -496,139 +498,55 @@
         }
 
         const easeInOutCubic = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-
-        function hexToRgb(hex) {
-            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-            return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : null;
-        }
-
-        function rgbToHsv(r, g, b) {
-            r /= 255, g /= 255, b /= 255;
-            let max = Math.max(r, g, b), min = Math.min(r, g, b);
-            let h, s, v = max;
-            let d = max - min;
-            s = max == 0 ? 0 : d / max;
-            if (max == min) { h = 0; } 
-            else {
-                switch (max) {
-                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-                    case g: h = (b - r) / d + 2; break;
-                    case b: h = (r - g) / d + 4; break;
-                }
-                h /= 6;
-            }
-            return { h: h * 360, s: s, v: v };
-        }
-
-        function hsvToRgb(h, s, v) {
-            let r, g, b;
-            let i = Math.floor(h / 60) % 6;
-            let f = h / 60 - i;
-            let p = v * (1 - s);
-            let q = v * (1 - f * s);
-            let t = v * (1 - (1 - f) * s);
-            switch (i) {
-                case 0: r = v, g = t, b = p; break;
-                case 1: r = q, g = v, b = p; break;
-                case 2: r = p, g = v, b = t; break;
-                case 3: r = p, g = q, b = v; break;
-                case 4: r = t, g = p, b = v; break;
-                case 5: r = v, g = p, b = q; break;
-            }
-            return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
-        }
-
+        function hexToRgb(hex) { const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex); return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : null; }
+        function rgbToHsv(r, g, b) { r /= 255, g /= 255, b /= 255; let max = Math.max(r, g, b), min = Math.min(r, g, b); let h, s, v = max; let d = max - min; s = max == 0 ? 0 : d / max; if (max == min) { h = 0; } else { switch (max) { case r: h = (g - b) / d + (g < b ? 6 : 0); break; case g: h = (b - r) / d + 2; break; case b: h = (r - g) / d + 4; break; } h /= 6; } return { h: h * 360, s: s, v: v }; }
+        function hsvToRgb(h, s, v) { let r, g, b; let i = Math.floor(h / 60) % 6; let f = h / 60 - i; let p = v * (1 - s); let q = v * (1 - f * s); let t = v * (1 - (1 - f) * s); switch (i) { case 0: r = v, g = t, b = p; break; case 1: r = q, g = v, b = p; break; case 2: r = p, g = v, b = t; break; case 3: r = p, g = q, b = v; break; case 4: r = t, g = p, b = v; break; case 5: r = v, g = p, b = q; break; } return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) }; }
         function triggerMeterAnimation(targetPercentage, visualEl, percentageEl, startColorHex, endColorHex) {
-            visualEl.style.setProperty('--percentage', 0);
-            percentageEl.textContent = '0%';
-            
-            const startRgb = hexToRgb(startColorHex);
-            const endRgb = hexToRgb(endColorHex);
-            if (!startRgb || !endRgb) return;
-
-            const startHsv = rgbToHsv(startRgb.r, startRgb.g, startRgb.b);
-            const endHsv = rgbToHsv(endRgb.r, endRgb.g, endRgb.b);
-
-            const duration = 1200;
-            let startTime = null;
-
+            visualEl.style.setProperty('--percentage', 0); percentageEl.textContent = '0%';
+            const startRgb = hexToRgb(startColorHex); const endRgb = hexToRgb(endColorHex); if (!startRgb || !endRgb) return;
+            const startHsv = rgbToHsv(startRgb.r, startRgb.g, startRgb.b); const endHsv = rgbToHsv(endRgb.r, endRgb.g, endRgb.b);
+            const duration = 1200; let startTime = null;
             function animationStep(timestamp) {
                 if (!startTime) startTime = timestamp;
-                const elapsedTime = timestamp - startTime;
-                const progress = Math.min(elapsedTime / duration, 1);
-                const easedProgress = easeInOutCubic(progress);
-
+                const elapsedTime = timestamp - startTime; const progress = Math.min(elapsedTime / duration, 1); const easedProgress = easeInOutCubic(progress);
                 const displayPercentage = targetPercentage * easedProgress;
-
-                const h = startHsv.h + easedProgress * (endHsv.h - startHsv.h);
-                const s = startHsv.s + easedProgress * (endHsv.s - startHsv.s);
-                const v = startHsv.v + easedProgress * (endHsv.v - startHsv.v);
-                
-                const interpolatedRgb = hsvToRgb(h, s, v);
-                const interpolatedColor = `rgb(${interpolatedRgb.r}, ${interpolatedRgb.g}, ${interpolatedRgb.b})`;
-
-                visualEl.style.setProperty('--percentage', displayPercentage);
-                visualEl.style.setProperty('--progress-color', interpolatedColor);
-                percentageEl.textContent = `${Math.floor(displayPercentage)}%`;
-                percentageEl.style.color = interpolatedColor;
-                
-                if (progress < 1) {
-                    requestAnimationFrame(animationStep);
-                }
+                const h = startHsv.h + easedProgress * (endHsv.h - startHsv.h); const s = startHsv.s + easedProgress * (endHsv.s - startHsv.s); const v = startHsv.v + easedProgress * (endHsv.v - startHsv.v);
+                const interpolatedRgb = hsvToRgb(h, s, v); const interpolatedColor = `rgb(${interpolatedRgb.r}, ${interpolatedRgb.g}, ${interpolatedRgb.b})`;
+                visualEl.style.setProperty('--percentage', displayPercentage); visualEl.style.setProperty('--progress-color', interpolatedColor);
+                percentageEl.textContent = `${Math.floor(displayPercentage)}%`; percentageEl.style.color = interpolatedColor;
+                if (progress < 1) requestAnimationFrame(animationStep);
             }
             requestAnimationFrame(animationStep);
         }
-
         function triggerPerfectAnimation() {
-            const endScreen = screens.end;
-            const visualEl = endScreen.querySelector('.results-visual');
-            const percentageEl = endScreen.querySelector('#end-percentage');
-            endScreen.classList.remove('is-animating');
-            percentageEl.textContent = '0%';
-            visualEl.style.setProperty('--percentage', 0);
-
+            const endScreen = screens.end; const visualEl = endScreen.querySelector('.results-visual'); const percentageEl = endScreen.querySelector('#end-percentage');
+            endScreen.classList.remove('is-animating'); percentageEl.textContent = '0%'; visualEl.style.setProperty('--percentage', 0);
             setTimeout(() => {
                 endScreen.classList.add('is-animating');
-                const duration = 1200;
-                const targetPercentage = 100;
-                let startTime = null;
-
+                const duration = 1200, targetPercentage = 100; let startTime = null;
                 function animationStep(timestamp) {
                     if (!startTime) startTime = timestamp;
-                    const elapsedTime = timestamp - startTime;
-                    const progress = Math.min(elapsedTime / duration, 1);
-                    const easedProgress = easeInOutCubic(progress);
-
+                    const elapsedTime = timestamp - startTime; const progress = Math.min(elapsedTime / duration, 1); const easedProgress = easeInOutCubic(progress);
                     const displayPercentage = targetPercentage * easedProgress;
-
-                    visualEl.style.setProperty('--percentage', displayPercentage);
-                    percentageEl.textContent = `${Math.floor(displayPercentage)}%`;
-                    
-                    if (progress < 1) {
-                        requestAnimationFrame(animationStep);
-                    } else {
-                        triggerConfetti();
-                    }
+                    visualEl.style.setProperty('--percentage', displayPercentage); percentageEl.textContent = `${Math.floor(displayPercentage)}%`;
+                    if (progress < 1) requestAnimationFrame(animationStep); else triggerConfetti();
                 }
                 requestAnimationFrame(animationStep);
             }, 350);
         }
         function triggerConfetti() {
-            const ctx = confettiCanvas.getContext('2d');
-            const W = confettiCanvas.offsetWidth, H = confettiCanvas.offsetHeight;
+            const ctx = confettiCanvas.getContext('2d'); const W = window.innerWidth, H = window.innerHeight;
             confettiCanvas.width = W; confettiCanvas.height = H;
-            const particles = [], particleCount = 150;
-            const colors = ["#007aff", "#34c759", "#ff9500", "#ff3b30", "#af52de", "#5856d6"];
+            const particles = [], particleCount = 150; const colors = ["#007aff", "#34c759", "#ff9500", "#ff3b30", "#af52de", "#5856d6"];
             for (let i = 0; i < particleCount; i++) { particles.push({ x: Math.random() * W, y: Math.random() * H - H, w: Math.random() * 10 + 5, h: Math.random() * 10 + 5, vx: (Math.random() - 0.5) * 10, vy: Math.random() * 5 + 2, angle: Math.random() * 360, color: colors[Math.floor(Math.random() * colors.length)] }); }
             let animationFrameId;
             function draw() {
                 ctx.clearRect(0, 0, W, H);
                 for (let i = 0; i < particles.length; i++) {
-                    const p = particles[i];
-                    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.angle * Math.PI / 180);
+                    const p = particles[i]; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.angle * Math.PI / 180);
                     ctx.fillStyle = p.color; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); ctx.restore();
                     p.y += p.vy; p.x += p.vx; p.angle += p.vx / 2;
-                    if (p.y > H) { particles.splice(i, 1); i--; }
+                    if (p.y > H + 20) { particles.splice(i, 1); i--; }
                 }
                 if (particles.length > 0) animationFrameId = requestAnimationFrame(draw);
                 else { ctx.clearRect(0, 0, W, H); cancelAnimationFrame(animationFrameId); }
