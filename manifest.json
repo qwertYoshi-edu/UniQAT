@@ -13,7 +13,7 @@
       "type": "image/png"
     }
   ],
-  "start_url": "https://qwertyoshi-edu.github.io/UniQAT/",
+  "start_url": "../index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#f2f2f7"
