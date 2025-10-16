@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>汎用一問一答トレーニング</title>
+    
+    <!-- Favicon（ブラウザタブ用） -->
+    <link rel="icon" href="/icons/icon-192.png" type="image/png">
+    <!-- Apple（iPhone/iPadのホーム画面アイコン用） -->
+    <link rel="apple-touch-icon" href="/icons/icon-512.png"
+    <!-- Android（PWA対応） -->
+    <link rel="manifest" href="/manifest.json">
+    <!-- テーマカラー設定（通知バーの色など） -->
+    <meta name="theme-color" content="#ffffff">
+    
     <style>
         :root {
             --primary-color: #007aff; --primary-hover: #005ecb;
@@ -27,7 +37,7 @@
         }
 
         .container {
-            width: 100%; max-width: 800px; height: 70vh; max-height: 700px;
+            width: 100%; max-width: 1200px; height: 70vh; max-height: 700px;
             padding: 2rem 1.5rem; background-color: var(--card-bg); border-radius: 20px;
             box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column; overflow: hidden;
             position: relative;
