@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>汎用一問一答トレーニング</title>
     
-    <link rel="icon" href="./icons/icon-v3-192.png" type="image/png">
-    <link rel="apple-touch-icon" href="./icons/icon-v3-512.png">
+    <link rel="icon" href="./icons/icon-v4-192.png" type="image/png">
+    <link rel="apple-touch-icon" href="./icons/icon-v4-512.png">
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#ffffff">
     
@@ -50,15 +50,27 @@
         .centered-content p { font-size: 1.2rem; color: var(--secondary-color); max-width: 660px; margin: 0 auto 1.8rem; }
         #input-text { width: 100%; flex-grow: 1; padding: 1.1rem; margin: 1.1rem 0; border: 1px solid var(--border-color);
             border-radius: 8px; font-size: 1.1rem; resize: none; box-sizing: border-box; font-family: var(--font-family); }
-        .settings-container { display: flex; flex-direction: column; gap: 1.8rem; margin-bottom: 1.8rem; }
-        .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.8rem; align-items: center; }
+        
+        .settings-row {
+            display: grid;
+            grid-template-columns: auto 1fr 1fr;
+            gap: 2rem;
+            align-items: center;
+            margin-bottom: 1.8rem;
+        }
         .setting-item { text-align: left; }
         .setting-item label { font-weight: 600; margin-bottom: 0.8rem; display: block; }
         .setting-item-row { display: flex; justify-content: flex-start; gap: 1.1rem; align-items: center; }
         .importance-filter { display: flex; justify-content: flex-start; gap: 1.1rem; }
         .importance-filter label, .shuffle-label { font-size: 1.1rem; font-weight: normal; }
         input[type="range"] { width: 100%; }
-        #start-btn { margin-top: 22px; }
+
+        .start-buttons-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 22px;
+        }
 
         .results-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: minmax(0, 1fr); gap: 2.2rem; height: 100%; }
         .incorrect-list-container { height: 100%; display: flex; flex-direction: column; border-right: 1px solid var(--border-color); padding-right: 2.2rem; min-height: 0; }
@@ -78,28 +90,13 @@
         #results-details { font-size: 1.2rem; color: var(--secondary-color); margin-bottom: 2.2rem; }
         .results-options { display: flex; flex-direction: column; gap: 1.1rem; width: 100%; max-width: 330px; margin: auto 0 0; }
 
-        /* --- PERFECT SCREEN STYLES --- */
         #end-screen { gap: 1.3rem; }
-        #end-screen h1 {
-            font-weight: 700;
-            font-size: 2.8rem;
-            margin: 0;
-            transform: scale(1.4);
-            opacity: 0;
-            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
+        #end-screen h1 { font-weight: 700; font-size: 2.8rem; margin: 0; transform: scale(1.4); opacity: 0; transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
         #end-screen.is-animating h1 { transform: scale(1); opacity: 1; }
         #end-screen .results-summary { flex-grow: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         #end-screen .results-visual { width: 154px; height: 154px; margin-bottom: 0.8rem; --progress-color: var(--success-color); }
-        #end-screen #end-percentage {
-            font-weight: 700;
-            font-size: 33px;
-            color: var(--success-color);
-            z-index: 1;
-        }
+        #end-screen #end-percentage { font-weight: 700; font-size: 33px; color: var(--success-color); z-index: 1; }
         #end-screen .results-options { margin: 0 auto; max-width: 330px; width: 100%; }
-        /* --- END PERFECT SCREEN --- */
-
 
         #main-screen { justify-content: space-between; }
         #progress-area { flex-shrink: 0; }
@@ -114,6 +111,7 @@
         #mistake-counter { font-size: 1.2rem; color: var(--danger-color); font-weight: 600; visibility: hidden; }
         #mistake-counter.visible { visibility: visible; }
         #importance-display { font-size: 1.4rem; color: var(--star-color); letter-spacing: 2px; }
+        #mode-indicator { text-align: center; color: var(--secondary-color); font-size: 0.9rem; margin-top: 8px; height: 1.2rem; }
 
         .large-text { font-size: 2.2rem; font-weight: 700; margin-bottom: 0.9rem; line-height: 1.3; word-wrap: break-word; display: flex; align-items: center; justify-content: center; gap: 1.1rem; width: 100%; }
         .small-text { font-size: 1.2rem; color: var(--secondary-color); margin-bottom: 1.8rem; width: 100%; word-wrap: break-word; line-height: 1.5; }
@@ -121,6 +119,7 @@
         .problem-view { width: 100%; transition: opacity 300ms ease-out, transform 300ms ease-out; }
         .problem-view.is-entering { opacity: 0; transform: translateY(22px); }
 
+        .final-check-answer { font-weight: 600; color: var(--primary-color); border-bottom: 2px solid var(--border-color); padding: 2px 4px; }
         #select-options-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.9rem; margin-top: 1.8rem; width: 100%; }
         #fill-content { text-align: center; line-height: 1.8; font-size: 1.25rem; margin-bottom: 1.8rem; width: 100%; }
         .fill-prefilled { font-weight: 600; color: var(--primary-color); border-bottom: 2px solid var(--border-color); padding: 5px 9px; margin: 0 6px; }
@@ -184,18 +183,21 @@
                 <button id="help-btn" aria-label="入力形式のヘルプ">?</button>
             </div>
             <textarea id="input-text" placeholder="ここに問題リストを貼り付けます。形式は「?」ボタンで確認できます。"></textarea>
-            <div class="settings-container">
-                <div class="settings-grid">
-                    <div class="setting-item"><label>重要度で絞り込み</label><div class="importance-filter"><label><input type="radio" name="importance" value="1-3" checked>すべて</label><label><input type="radio" name="importance" value="2-3">重要</label><label><input type="radio" name="importance" value="3-3">最重要</label></div></div>
-                    <div class="setting-item"><label for="fill-rate-slider">穴埋め問題の空欄率: <span id="fill-rate-value">100</span>%</label><input type="range" id="fill-rate-slider" min="50" max="100" value="100"></div>
+            <div class="settings-row">
+                <div class="setting-item">
+                    <div class="setting-item-row"><input type="checkbox" id="shuffle-checkbox"><label for="shuffle-checkbox" class="shuffle-label">出題順をランダムに</label></div>
                 </div>
-                <div class="setting-item-row"><input type="checkbox" id="shuffle-checkbox"><label for="shuffle-checkbox" class="shuffle-label">出題順をランダムにする</label></div>
+                <div class="setting-item"><label>重要度で絞り込み</label><div class="importance-filter"><label><input type="radio" name="importance" value="1-3" checked>すべて</label><label><input type="radio" name="importance" value="2-3">重要</label><label><input type="radio" name="importance" value="3-3">最重要</label></div></div>
+                <div class="setting-item"><label for="fill-rate-slider">穴埋め問題の空欄率: <span id="fill-rate-value">100</span>%</label><input type="range" id="fill-rate-slider" min="50" max="100" value="100"></div>
             </div>
-            <button id="start-btn" class="btn-primary">開始</button>
+            <div class="start-buttons-container">
+                <button id="start-btn" class="btn-primary">通常スタート</button>
+                <button id="final-check-btn" class="btn-secondary">直前チェック</button>
+            </div>
         </div>
 
-        <div id="main-screen" class="screen"><div id="progress-area"><div id="progress-bar-container"><div id="progress-bar"></div></div><div class="progress-info"><div class="progress-info-left"><div id="progress-text"></div><div id="mistake-counter"></div></div><div id="importance-display"></div></div></div><div id="content-area"><div id="check-view" class="problem-view"><div class="large-text"></div><div class="small-text"></div></div><div id="select-view" class="problem-view"><div class="large-text"></div><div class="small-text"></div><div id="select-options-container"></div></div><div id="enter-view" class="problem-view"><div class="large-text"></div><div class="input-form"><input type="text" id="enter-input" class="text-input" placeholder="答えを入力"></div></div><div id="fill-view" class="problem-view"><div class="large-text"></div><div id="fill-content"></div><div class="input-form"></div></div></div><div id="action-area"><div id="feedback-container"><span id="feedback-text"></span><button id="add-to-review-btn">復習リストに追加</button></div><div id="check-button-container" class="button-container input-form"><button id="review-btn" class="btn-secondary">後でもう一度確認</button><button id="ok-btn" class="btn-success">OK</button></div><button id="action-btn" class="btn-primary"></button></div></div>
-        <div id="intermediate-screen" class="screen"><div class="results-grid"><div class="incorrect-list-container"><h3>間違えた問題</h3><ul id="incorrect-list"></ul></div><div class="results-summary-container"><h1>お疲れ様でした！</h1><div class="results-summary"><div class="results-visual"><span id="results-percentage"></span></div><div id="results-details"></div></div><div class="results-options"><button id="retry-incorrect-btn" class="btn-primary">間違えた問題を復習</button><button id="retry-all-btn" class="btn-secondary">もう一度すべて解く</button><button id="restart-completely-btn" class="btn-secondary">新しい問題で始める</button></div></div></div></div>
+        <div id="main-screen" class="screen"><div id="progress-area"><div id="progress-bar-container"><div id="progress-bar"></div></div><div class="progress-info"><div class="progress-info-left"><div id="progress-text"></div><div id="mistake-counter"></div></div><div id="importance-display"></div></div><div id="mode-indicator"></div></div><div id="content-area"><div id="check-view" class="problem-view"><div class="large-text"></div><div class="small-text"></div></div><div id="select-view" class="problem-view"><div class="large-text"></div><div class="small-text"></div><div id="select-options-container"></div></div><div id="enter-view" class="problem-view"><div class="large-text"></div><div class="input-form"><input type="text" id="enter-input" class="text-input" placeholder="答えを入力"></div></div><div id="fill-view" class="problem-view"><div class="large-text"></div><div id="fill-content"></div><div class="input-form"></div></div></div><div id="action-area"><div id="feedback-container"><span id="feedback-text"></span><button id="add-to-review-btn">復習リストに追加</button></div><div id="check-button-container" class="button-container input-form"><button id="review-btn" class="btn-secondary">後でもう一度確認</button><button id="ok-btn" class="btn-success">OK</button></div><button id="action-btn" class="btn-primary"></button></div></div>
+        <div id="intermediate-screen" class="screen"><div class="results-grid"><div class="incorrect-list-container"><h3>間違えた問題</h3><ul id="incorrect-list"></ul></div><div class="results-summary-container"><h1>お疲れ様でした！</h1><div class="results-summary"><div class="results-visual"><span id="results-percentage"></span></div><div id="results-details"></div></div><div class="results-options"><button id="retry-incorrect-btn" class="btn-primary">間違えた問題を復習</button><button id="retry-all-btn" class="btn-secondary">もう一度すべて解く</button><button id="retry-final-check-btn" class="btn-secondary">直前チェック (全問題)</button><button id="restart-completely-btn" class="btn-secondary">新しい問題で始める</button></div></div></div></div>
         
         <div id="end-screen" class="screen centered-content">
             <h1>パーフェクト！</h1>
@@ -220,14 +222,15 @@
         let originalWordList = [], wordList = [], reviewList = [];
         let currentIndex = 0, correctCount = 0, checkOKCount = 0, checkReviewCount = 0;
         let currentPassTotalForRate = 0, isReviewPhase = false, currentScreen = 'setup';
-        let mistakeCount = 0, fillBlankRate = 100, isCheckOnlyMode = false;
+        let mistakeCount = 0, fillBlankRate = 100, isCheckOnlyMode = false, isFinalCheckMode = false;
 
         const screens = { setup: document.getElementById('setup-screen'), main: document.getElementById('main-screen'), intermediate: document.getElementById('intermediate-screen'), end: document.getElementById('end-screen') };
         const views = { check: document.getElementById('check-view'), select: document.getElementById('select-view'), enter: document.getElementById('enter-view'), fill: document.getElementById('fill-view') };
         const feedbackContainer = document.getElementById('feedback-container'), feedbackText = document.getElementById('feedback-text'), actionBtn = document.getElementById('action-btn'),
               checkButtonContainer = document.getElementById('check-button-container'), progressBar = document.getElementById('progress-bar'),
               progressTextEl = document.getElementById('progress-text'), importanceDisplay = document.getElementById('importance-display'),
-              mistakeCounter = document.getElementById('mistake-counter'), addToReviewBtn = document.getElementById('add-to-review-btn');
+              mistakeCounter = document.getElementById('mistake-counter'), addToReviewBtn = document.getElementById('add-to-review-btn'),
+              modeIndicator = document.getElementById('mode-indicator');
         const helpBtn = document.getElementById('help-btn'), helpModal = document.getElementById('help-modal'),
               modalOverlay = helpModal.querySelector('.modal-overlay'), modalCloseBtn = helpModal.querySelector('.modal-close-btn');
         const fillRateSlider = document.getElementById('fill-rate-slider'), fillRateValue = document.getElementById('fill-rate-value');
@@ -236,9 +239,11 @@
         helpBtn.addEventListener('click', () => helpModal.classList.add('active'));
         modalOverlay.addEventListener('click', () => helpModal.classList.remove('active'));
         modalCloseBtn.addEventListener('click', () => helpModal.classList.remove('active'));
-        document.getElementById('start-btn').addEventListener('click', startGame);
+        document.getElementById('start-btn').addEventListener('click', () => startGame(false));
+        document.getElementById('final-check-btn').addEventListener('click', () => startGame(true));
         document.getElementById('retry-incorrect-btn').addEventListener('click', retryIncorrect);
         document.getElementById('retry-all-btn').addEventListener('click', retryAll);
+        document.getElementById('retry-final-check-btn').addEventListener('click', () => { isFinalCheckMode = true; startNewPass(originalWordList, false); });
         document.getElementById('restart-completely-btn').addEventListener('click', restartGame);
         document.getElementById('end-retry-all-btn').addEventListener('click', retryAll);
         document.getElementById('end-restart-btn').addEventListener('click', restartGame);
@@ -262,7 +267,8 @@
         }
         screens['setup'].classList.add('visible');
 
-        function startGame() {
+        function startGame(isCheckMode = false) {
+            isFinalCheckMode = isCheckMode;
             const allProblems = parseText(document.getElementById('input-text').value);
             const selectedImportance = document.querySelector('input[name="importance"]:checked').value;
             const [minImp, maxImp] = selectedImportance.split('-').map(Number);
@@ -272,19 +278,20 @@
             }
             if (filteredProblems.length === 0) { alert('選択した重要度の問題がありません。'); return; }
             originalWordList = JSON.parse(JSON.stringify(filteredProblems));
-            mistakeCount = 0;
             fillBlankRate = parseInt(fillRateSlider.value, 10);
             startNewPass(filteredProblems, false);
         }
         function startNewPass(problems, isReview) {
             wordList = [...problems]; reviewList = []; currentIndex = 0; correctCount = 0; checkOKCount = 0; checkReviewCount = 0;
+            mistakeCount = 0;
             currentPassTotalForRate = wordList.filter(p => p.type !== 'check').length;
             isCheckOnlyMode = wordList.every(p => p.type === 'check');
             isReviewPhase = isReview;
+            modeIndicator.textContent = isFinalCheckMode ? '直前チェック' : '通常モード';
             switchScreen('main'); showNextProblem();
         }
-        function retryIncorrect() { if (reviewList.length > 0) startNewPass(reviewList, true); }
-        function retryAll() { startNewPass(originalWordList, false); }
+        function retryIncorrect() { isFinalCheckMode = false; if (reviewList.length > 0) startNewPass(reviewList, true); }
+        function retryAll() { isFinalCheckMode = false; startNewPass(originalWordList, false); }
         function restartGame() { switchScreen('setup'); }
         function parseImportance(text) { const match = text.match(/_([1-3])$/); return match ? { text: text.substring(0, text.length - 2).trim(), importance: parseInt(match[1], 10) } : { text: text.trim(), importance: 1 }; }
         function parseText(text) { return text.trim().split('#').map(p => p.trim()).filter(Boolean).map(parseProblem).filter(Boolean); }
@@ -322,21 +329,41 @@
 
             const problem = wordList[currentIndex];
             const reviewMark = isReviewPhase ? `<span class="review-indicator">復習</span>` : '';
-            const view = views[problem.type];
-            const largeTextContent = view.querySelector('.large-text'); largeTextContent.innerHTML = '';
+            const view = views[isFinalCheckMode ? 'check' : problem.type];
+            const largeTextContent = view.querySelector('.large-text');
+            largeTextContent.innerHTML = '';
             const textSpan = document.createElement('span'); textSpan.textContent = problem.largeText;
             largeTextContent.appendChild(textSpan);
             if (isReviewPhase) largeTextContent.insertAdjacentHTML('beforeend', reviewMark);
-            if (view.querySelector('.small-text')) view.querySelector('.small-text').textContent = problem.smallText || '';
             
             view.classList.add('is-entering');
             view.style.display = 'block';
             requestAnimationFrame(() => { view.classList.remove('is-entering'); });
 
-            if (problem.type === 'check') setupCheck();
-            else if (problem.type === 'select') setupSelect(problem);
-            else if (problem.type === 'enter') setupEnter(problem);
-            else if (problem.type === 'fill') setupFill(problem);
+            if (isFinalCheckMode) {
+                let answerHtml = '';
+                switch(problem.type) {
+                    case 'select':
+                    case 'enter':
+                        answerHtml = problem.correctAnswer;
+                        break;
+                    case 'fill':
+                        answerHtml = problem.questionParts.map((part, index) => {
+                            return part + (index < problem.answers.length ? `<span class="final-check-answer">${problem.answers[index]}</span>` : '');
+                        }).join('');
+                        break;
+                    default: // check
+                        answerHtml = problem.smallText || '';
+                }
+                view.querySelector('.small-text').innerHTML = answerHtml;
+                setupCheck();
+            } else {
+                if (view.querySelector('.small-text')) view.querySelector('.small-text').textContent = problem.smallText || '';
+                if (problem.type === 'check') setupCheck();
+                else if (problem.type === 'select') setupSelect(problem);
+                else if (problem.type === 'enter') setupEnter(problem);
+                else if (problem.type === 'fill') setupFill(problem);
+            }
         }
 
         function setupCheck() {
@@ -393,16 +420,16 @@
         }
         function handleAnswerFeedback(isCorrect, correctAnswerText) {
             const problem = wordList[currentIndex];
-            if (problem.type === 'check') {
+            if (problem.type === 'check' || isFinalCheckMode) {
                 isCorrect ? checkOKCount++ : checkReviewCount++;
             } else {
                 if(isCorrect) correctCount++;
             }
             if (!isCorrect) {
                 if(!reviewList.includes(problem)) reviewList.push(problem);
-                if(problem.type !== 'check') mistakeCount++;
+                if(problem.type !== 'check' && !isFinalCheckMode) mistakeCount++;
             }
-            if (problem.type !== 'check') {
+            if (problem.type !== 'check' && !isFinalCheckMode) {
                 feedbackText.textContent = isCorrect ? '正解！' : `不正解　正しい解答: ${correctAnswerText}`;
                 feedbackContainer.classList.add(isCorrect ? 'correct' : 'incorrect', 'visible');
                 addToReviewBtn.style.display = 'block';
