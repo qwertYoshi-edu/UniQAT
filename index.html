@@ -24,7 +24,7 @@
             --accent-color: var(--primary-color);
         }
 
-        html { font-size: 16px; }
+        html { font-size: 13px; }
 
         body {
             font-family: var(--font-family); margin: 0; padding: 16px; background-color: var(--card-bg);
@@ -39,7 +39,7 @@
         }
         #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2000; }
 
-        .screen { display: none; width: 100%; /* min-height: 70vh; */ flex-direction: column; opacity: 0; transition: opacity 0.3s ease-in-out; }
+        .screen { display: none; width: 100%; flex-direction: column; opacity: 0; transition: opacity 0.3s ease-in-out; }
         .screen.active { display: flex; }
         .screen.visible { opacity: 1; }
 
@@ -59,7 +59,7 @@
         }
         .setting-item { text-align: left; }
         .setting-item label { font-weight: 600; margin-bottom: 0.8rem; display: block; }
-        .setting-item-row { display: flex; justify-content: flex-start; gap: 1.1rem; align-items: center; }
+        .setting-item-row { display: flex; justify-content: flex-start; gap: 0.5rem; align-items: center; }
         .importance-filter { display: flex; justify-content: flex-start; gap: 1.1rem; }
         .importance-filter label, .shuffle-label { font-size: 1.1rem; font-weight: normal; }
         input[type="range"] { width: 100%; }
@@ -71,6 +71,7 @@
             margin-top: 22px;
         }
 
+        #intermediate-screen { position: relative; }
         .results-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: minmax(0, 1fr); gap: 2.2rem; height: 100%; width: 100%;}
         .incorrect-list-container { height: 100%; display: flex; flex-direction: column; border-right: 1px solid var(--border-color); padding-right: 2.2rem; min-height: 0; }
         .incorrect-list-container h3 { margin: 0 0 1.1rem 0; text-align: left; flex-shrink: 0; }
@@ -97,7 +98,10 @@
         #end-screen #end-percentage { font-weight: 700; font-size: 33px; color: var(--success-color); z-index: 1; }
         #end-screen .results-options { margin: 0 auto; max-width: 330px; width: 100%; }
 
-        #main-screen { justify-content: space-between; }
+        #main-screen { 
+            justify-content: space-between;
+            min-height: calc(100vh - 64px);
+        }
         #progress-area { flex-shrink: 0; padding-bottom: 1rem; }
         #content-area { flex-grow: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; overflow-y: auto; padding: 1.1rem 0; width: 100%; }
         #action-area { flex-shrink: 0; min-height: 100px; display: flex; flex-direction: column; justify-content: flex-end; padding-top: 1.1rem; }
@@ -173,6 +177,120 @@
         .copy-example { white-space: pre-wrap; word-break: break-all; }
         #copy-textarea { width: 100%; height: 250px; resize: vertical; box-sizing: border-box; margin-top: 1rem; }
 
+        .list-toggle-btn, .list-overlay { display: none; }
+
+        @media (max-width: 768px) {
+            body { padding: 8px; min-height: calc(100vh - 16px); }
+            h1 { font-size: 2rem; }
+
+            .settings-row {
+                grid-template-columns: 1fr;
+                gap: 1.8rem;
+                margin-bottom: 2rem;
+            }
+            .setting-item {
+                text-align: left;
+            }
+            .setting-item-row, .importance-filter {
+                justify-content: flex-start;
+            }
+            .setting-item.importance-setting {
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                gap: 1rem;
+            }
+            .setting-item.importance-setting > label {
+                display: inline;
+                margin-bottom: 0;
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+
+            #feedback-container {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+            #add-to-review-btn {
+                position: relative;
+                transform: none;
+                top: auto;
+                right: auto;
+                width: auto;
+                padding: 6px 12px;
+                font-size: 1rem;
+            }
+
+            #intermediate-screen {
+                overflow-x: hidden;
+            }
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+            .incorrect-list-container {
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: 80vw;
+                height: 100%;
+                background-color: var(--card-bg);
+                z-index: 1002;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease-in-out;
+                padding: 1.5rem;
+                box-sizing: border-box;
+                box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+                border-right: none;
+            }
+            #intermediate-screen.list-open .incorrect-list-container {
+                transform: translateX(0);
+            }
+
+            .list-toggle-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: fixed;
+                left: 10px;
+                top: 50%;
+                transform: translateY(-50%);
+                z-index: 2001;
+                width: 36px;
+                height: 44px;
+                border-radius: 0 50% 50% 0;
+                border: 1px solid var(--border-color);
+                border-left: none;
+                background-color: var(--card-bg);
+                font-size: 1.5rem;
+                font-weight: bold;
+                color: var(--primary-color);
+                cursor: pointer;
+                transition: left 0.3s ease-in-out;
+                padding: 0;
+                padding-left: 2px;
+            }
+            #intermediate-screen.list-open .list-toggle-btn {
+                left: 80vw;
+            }
+            .list-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0,0,0,0.4);
+                z-index: 1001;
+                opacity: 0;
+                transition: opacity 0.3s ease-in-out;
+                pointer-events: none;
+            }
+            #intermediate-screen.list-open .list-overlay {
+                display: block;
+                opacity: 1;
+                pointer-events: auto;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -187,10 +305,19 @@
             <textarea id="input-text" placeholder="ここに問題リストを貼り付けます。形式は「?」ボタンで確認できます。"></textarea>
             <div class="settings-row">
                 <div class="setting-item">
-                    <div class="setting-item-row"><input type="checkbox" id="shuffle-checkbox"><label for="shuffle-checkbox" class="shuffle-label">出題順をランダムに</label></div>
+                    <div class="setting-item-row">
+                        <label for="shuffle-checkbox" class="shuffle-label">出題順をランダムに</label>
+                        <input type="checkbox" id="shuffle-checkbox">
+                    </div>
                 </div>
-                <div class="setting-item"><label>重要度で絞り込み</label><div class="importance-filter"><label><input type="radio" name="importance" value="1-3" checked>すべて</label><label><input type="radio" name="importance" value="2-3">重要</label><label><input type="radio" name="importance" value="3-3">最重要</label></div></div>
-                <div class="setting-item"><label for="fill-rate-slider">穴埋め問題の空欄率: <span id="fill-rate-value">100</span>%</label><input type="range" id="fill-rate-slider" min="50" max="100" value="100"></div>
+                <div class="setting-item importance-setting">
+                    <label>重要度で絞り込み</label>
+                    <div class="importance-filter"><label><input type="radio" name="importance" value="1-3" checked>すべて</label><label><input type="radio" name="importance" value="2-3">重要</label><label><input type="radio" name="importance" value="3-3">最重要</label></div>
+                </div>
+                <div class="setting-item">
+                    <label for="fill-rate-slider">穴埋め問題の空欄率: <span id="fill-rate-value">100</span>%</label>
+                    <input type="range" id="fill-rate-slider" min="50" max="100" value="100">
+                </div>
             </div>
             <div class="start-buttons-container">
                 <button id="start-btn" class="btn-primary">通常スタート</button>
@@ -199,7 +326,25 @@
         </div>
 
         <div id="main-screen" class="screen"><div id="progress-area"><div id="progress-bar-container"><div id="progress-bar"></div></div><div class="progress-info"><div class="progress-info-left"><div id="progress-text"></div><div id="mistake-counter"></div></div><div id="importance-display"></div></div><div id="mode-indicator"></div></div><div id="content-area"><div id="check-view" class="problem-view"><div class="large-text"></div><div class="small-text"></div></div><div id="select-view" class="problem-view"><div class="large-text"></div><div class="small-text"></div><div id="select-options-container"></div></div><div id="enter-view" class="problem-view"><div class="large-text"></div><div class="input-form"><input type="text" id="enter-input" class="text-input" placeholder="答えを入力"></div></div><div id="fill-view" class="problem-view"><div class="large-text"></div><div id="fill-content"></div><div class="input-form"></div></div></div><div id="action-area"><div id="feedback-container"><span id="feedback-text"></span><button id="add-to-review-btn">復習リストに追加</button></div><div id="check-button-container" class="button-container input-form"><button id="review-btn" class="btn-secondary">後でもう一度確認</button><button id="ok-btn" class="btn-success">OK</button></div><button id="action-btn" class="btn-primary"></button></div></div>
-        <div id="intermediate-screen" class="screen"><div class="results-grid"><div class="incorrect-list-container"><h3>間違えた問題</h3><ul id="incorrect-list"></ul></div><div class="results-summary-container"><h1>お疲れ様でした！</h1><div class="results-summary"><div class="results-visual"><span id="results-percentage"></span></div><div id="results-details"></div></div><div class="results-options"><button id="retry-incorrect-btn" class="btn-primary">間違えた問題を復習</button><button id="copy-incorrect-btn" class="btn-secondary">誤答問題をコピー</button><button id="retry-all-btn" class="btn-secondary">もう一度すべて解く</button><button id="retry-final-check-btn" class="btn-secondary">直前チェック (全問題)</button><button id="restart-completely-btn" class="btn-secondary">新しい問題で始める</button></div></div></div></div>
+        
+        <div id="intermediate-screen" class="screen">
+            <button id="toggle-incorrect-list-btn" class="list-toggle-btn">&gt;</button>
+            <div class="list-overlay"></div>
+            <div class="results-grid">
+                <div class="incorrect-list-container"><h3>間違えた問題</h3><ul id="incorrect-list"></ul></div>
+                <div class="results-summary-container">
+                    <h1>お疲れ様でした！</h1>
+                    <div class="results-summary"><div class="results-visual"><span id="results-percentage"></span></div><div id="results-details"></div></div>
+                    <div class="results-options">
+                        <button id="retry-incorrect-btn" class="btn-primary">間違えた問題を復習</button>
+                        <button id="copy-incorrect-btn" class="btn-secondary">誤答問題をコピー</button>
+                        <button id="retry-all-btn" class="btn-secondary">もう一度すべて解く</button>
+                        <button id="retry-final-check-btn" class="btn-secondary">直前チェック (全問題)</button>
+                        <button id="restart-completely-btn" class="btn-secondary">新しい問題で始める</button>
+                    </div>
+                </div>
+            </div>
+        </div>
         
         <div id="end-screen" class="screen centered-content">
             <h1>パーフェクト！</h1>
@@ -240,6 +385,25 @@
         const copyIncorrectBtn = document.getElementById('copy-incorrect-btn'), copyModal = document.getElementById('copy-modal'), copyTextarea = document.getElementById('copy-textarea');
         const fillRateSlider = document.getElementById('fill-rate-slider'), fillRateValue = document.getElementById('fill-rate-value');
         const confettiCanvas = document.getElementById('confetti-canvas');
+        
+        const intermediateScreen = document.getElementById('intermediate-screen');
+        const toggleIncorrectListBtn = document.getElementById('toggle-incorrect-list-btn');
+        const listOverlay = document.querySelector('.list-overlay');
+
+        if (toggleIncorrectListBtn) {
+            toggleIncorrectListBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                intermediateScreen.classList.toggle('list-open');
+                toggleIncorrectListBtn.innerHTML = intermediateScreen.classList.contains('list-open') ? '&lt;' : '&gt;';
+            });
+        }
+        if (listOverlay) {
+            listOverlay.addEventListener('click', (e) => {
+                e.stopPropagation();
+                intermediateScreen.classList.remove('list-open');
+                toggleIncorrectListBtn.innerHTML = '&gt;';
+            });
+        }
 
         function setupModal(modal) {
             const overlay = modal.querySelector('.modal-overlay');
