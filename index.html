@@ -18,7 +18,7 @@
             --danger-color: #ff3b30;  --danger-bg: rgba(255, 59, 48, 0.1); --danger-text-on-bg: #c72d23;
             --warning-color: #ff9500;
             --star-color: #ffcc00;
-            --light-bg: #f2f2f7; --text-color: #1c1c1e;
+            --light-bg: #f5f7fa; --text-color: #1c1c1e;
             --card-bg: #ffffff; --border-color: #e5e5ea;
             --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
             --accent-color: var(--primary-color);
@@ -44,31 +44,144 @@
         .screen.visible { opacity: 1; }
 
         .centered-content { justify-content: center; align-items: center; text-align: center; }
-        .centered-content h1 { font-size: 2.4rem; margin-top: 0; margin-bottom: 0.5rem; }
-        .centered-content .description-wrapper { display: flex; align-items: center; justify-content: center; gap: 0.8rem; }
-        .centered-content p { font-size: 1.2rem; color: var(--secondary-color); max-width: 660px; margin: 0 auto 1.8rem; }
-        #input-text { width: 100%; height: 25vh; padding: 1.1rem; margin: 1.1rem 0; border: 1px solid var(--border-color);
+        
+        #setup-screen .setup-content {
+            width: 80%;
+            margin: 0 auto;
+        }
+        #setup-screen h1 { font-size: 2.2rem; color: #333; letter-spacing: 1px; }
+        #setup-screen p { font-size: 1.2rem; color: var(--secondary-color); max-width: 660px; margin: 0 auto 1.8rem; }
+        .description-wrapper { display: flex; align-items: center; justify-content: center; gap: 0.8rem; }
+        #input-text { width: 100%; height: 25vh; min-height: 120px; padding: 1.1rem; margin: 1.1rem 0; border: 1px solid var(--border-color);
             border-radius: 8px; font-size: 1.1rem; resize: vertical; box-sizing: border-box; font-family: var(--font-family); }
         
+        .settings-wrapper {
+            background-color: var(--light-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
         .settings-row {
             display: grid;
-            grid-template-columns: auto 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 2rem;
             align-items: center;
-            margin-bottom: 1.8rem;
         }
         .setting-item { text-align: left; }
-        .setting-item label { font-weight: 600; margin-bottom: 0.8rem; display: block; }
-        .setting-item-row { display: flex; justify-content: flex-start; gap: 0.5rem; align-items: center; }
-        .importance-filter { display: flex; justify-content: flex-start; gap: 1.1rem; }
-        .importance-filter label, .shuffle-label { font-size: 1.1rem; font-weight: normal; }
-        input[type="range"] { width: 100%; }
+        .setting-item > label:not(.setting-item-row) { font-weight: 600; margin-bottom: 0.8rem; display: block; }
 
         .start-buttons-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 1rem;
             margin-top: 22px;
+        }
+        .start-buttons-container button { padding-top: 1.2rem; padding-bottom: 1.2rem; }
+
+        /* Custom Form Controls */
+        /* Checkbox */
+        .setting-item-row.shuffle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            padding: 0.5rem 0;
+        }
+        .shuffle-label { font-size: 1.1rem; font-weight: normal; user-select: none; }
+        #shuffle-checkbox {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            position: absolute;
+        }
+        .custom-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--card-bg);
+        }
+        .custom-checkbox::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23fff' d='M6.564.75l-3.59 3.612-1.538-1.55L0 4.26 2.974 7.25 8 2.193z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        #shuffle-checkbox:checked ~ .custom-checkbox {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        #shuffle-checkbox:checked ~ .custom-checkbox::after {
+            opacity: 1;
+        }
+
+
+        /* Radio Buttons (Segmented Control) */
+        .importance-filter {
+            display: inline-flex;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: var(--card-bg);
+        }
+        .importance-filter input[type="radio"] {
+            display: none;
+        }
+        .importance-filter label {
+            padding: 0.6rem 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--secondary-color);
+            border-left: 1px solid var(--border-color);
+        }
+        .importance-filter label:first-of-type {
+            border-left: none;
+        }
+        .importance-filter input[type="radio"]:checked + label {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Slider */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--primary-color);
+            cursor: pointer;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: var(--primary-color);
+            cursor: pointer;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.2);
         }
 
         #intermediate-screen { position: relative; }
@@ -144,11 +257,30 @@
         #add-to-review-btn { font-size: 0.9rem; padding: 5px 11px; width: auto; position: absolute; right: 1.1rem; top: 50%; transform: translateY(-50%); background-color: var(--secondary-color); color: white; border-radius: 6px; }
         #add-to-review-btn:disabled { background-color: var(--border-color); color: var(--secondary-color); }
 
-        button { padding: 1.1rem; font-size: 1.1rem; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.2s, transform 0.1s; width: 100%; }
+        button { 
+            padding: 1.0rem; font-size: 1.1rem; font-weight: 600; border: none; border-radius: 8px; 
+            cursor: pointer; transition: background-color 0.2s, transform 0.1s; width: 100%; 
+        }
         button:hover { opacity: 0.9; } button:active { transform: scale(0.98); } button:disabled { opacity: 0.5; cursor: not-allowed; }
+        
         .btn-primary { background-color: var(--primary-color); color: white; } .btn-primary:hover { background-color: var(--primary-hover); }
         .btn-secondary { background-color: var(--secondary-color); color: white; } .btn-secondary:hover { background-color: var(--secondary-hover); }
         .btn-success { background-color: var(--success-color); color: white; }
+        
+        .btn-with-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6em;
+            padding-left: 1.5em;
+            padding-right: 1.5em;
+        }
+        .btn-with-icon svg {
+            width: 1.3em;
+            height: 1.3em;
+            fill: currentColor;
+        }
+
         .select-option-btn { background-color: var(--card-bg); color: var(--primary-color); border: 2px solid var(--border-color); font-weight: 500; }
         .select-option-btn:hover { border-color: var(--primary-color); background-color: #f2f8ff; }
         .select-option-btn.correct { background-color: var(--success-bg) !important; color: var(--success-text-on-bg); border-color: var(--success-color); }
@@ -180,31 +312,29 @@
         .list-toggle-btn, .list-overlay { display: none; }
 
         @media (max-width: 768px) {
-            body { padding: 8px; min-height: calc(100vh - 16px); }
-            h1 { font-size: 2rem; }
+            #setup-screen .setup-content {
+                width: 100%;
+            }
+            #setup-screen h1 { font-size: 2rem; }
 
+            .settings-wrapper {
+                padding: 1.5rem;
+            }
             .settings-row {
                 grid-template-columns: 1fr;
                 gap: 1.8rem;
-                margin-bottom: 2rem;
             }
             .setting-item {
                 text-align: left;
             }
-            .setting-item-row, .importance-filter {
-                justify-content: flex-start;
-            }
-            .setting-item.importance-setting {
-                display: flex;
-                align-items: center;
-                justify-content: flex-start;
-                gap: 1rem;
+            .setting-item > label:not(.setting-item-row) {
+                margin-bottom: 1rem;
             }
             .setting-item.importance-setting > label {
-                display: inline;
-                margin-bottom: 0;
-                white-space: nowrap;
-                flex-shrink: 0;
+                margin-bottom: 1rem;
+            }
+            .importance-setting .importance-filter {
+                padding-left: 0.5rem;
             }
 
             #feedback-container {
@@ -297,35 +427,44 @@
     <div class="container">
         <canvas id="confetti-canvas"></canvas>
         <div id="setup-screen" class="screen active centered-content">
-            <h1>汎用一問一答トレーニング</h1>
-            <div class="description-wrapper">
-                <p>学習したい内容を貼り付け、オプションを選択して開始してください。</p>
-                <button id="help-btn" aria-label="入力形式のヘルプ">?</button>
-            </div>
-            <textarea id="input-text" placeholder="ここに問題リストを貼り付けます。形式は「?」ボタンで確認できます。"></textarea>
-            <div class="settings-row">
-                <div class="setting-item">
-                    <div class="setting-item-row">
-                        <label for="shuffle-checkbox" class="shuffle-label">出題順をランダムに</label>
-                        <input type="checkbox" id="shuffle-checkbox">
+            <div class="setup-content">
+                <h1>汎用一問一答トレーニング</h1>
+                <div class="description-wrapper">
+                    <p>学習したい内容を貼り付け、オプションを選択して開始してください。</p>
+                    <button id="help-btn" aria-label="入力形式のヘルプ">?</button>
+                </div>
+                <textarea id="input-text" placeholder="ここに問題リストを貼り付けます。形式は「?」ボタンで確認できます。"></textarea>
+                <div class="settings-wrapper">
+                    <div class="settings-row">
+                        <div class="setting-item">
+                            <label for="shuffle-checkbox" class="setting-item-row shuffle-container">
+                                <span class="shuffle-label">出題順をランダムに</span>
+                                <input type="checkbox" id="shuffle-checkbox">
+                                <div class="custom-checkbox"></div>
+                            </label>
+                        </div>
+                        <div class="setting-item importance-setting">
+                            <label>重要度で絞り込み</label>
+                            <div class="importance-filter">
+                                <input type="radio" name="importance" value="1-3" id="imp-all" checked><label for="imp-all">すべて</label>
+                                <input type="radio" name="importance" value="2-3" id="imp-high"><label for="imp-high">重要</label>
+                                <input type="radio" name="importance" value="3-3" id="imp-highest"><label for="imp-highest">最重要</label>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <label for="fill-rate-slider">穴埋め問題の空欄率: <span id="fill-rate-value">100</span>%</label>
+                            <input type="range" id="fill-rate-slider" min="50" max="100" value="100">
+                        </div>
                     </div>
                 </div>
-                <div class="setting-item importance-setting">
-                    <label>重要度で絞り込み</label>
-                    <div class="importance-filter"><label><input type="radio" name="importance" value="1-3" checked>すべて</label><label><input type="radio" name="importance" value="2-3">重要</label><label><input type="radio" name="importance" value="3-3">最重要</label></div>
+                <div class="start-buttons-container">
+                    <button id="start-btn" class="btn-primary btn-with-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><span>通常スタート</span></button>
+                    <button id="final-check-btn" class="btn-secondary btn-with-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg><span>直前チェック</span></button>
                 </div>
-                <div class="setting-item">
-                    <label for="fill-rate-slider">穴埋め問題の空欄率: <span id="fill-rate-value">100</span>%</label>
-                    <input type="range" id="fill-rate-slider" min="50" max="100" value="100">
-                </div>
-            </div>
-            <div class="start-buttons-container">
-                <button id="start-btn" class="btn-primary">通常スタート</button>
-                <button id="final-check-btn" class="btn-secondary">直前チェック</button>
             </div>
         </div>
 
-        <div id="main-screen" class="screen"><div id="progress-area"><div id="progress-bar-container"><div id="progress-bar"></div></div><div class="progress-info"><div class="progress-info-left"><div id="progress-text"></div><div id="mistake-counter"></div></div><div id="importance-display"></div></div><div id="mode-indicator"></div></div><div id="content-area"><div id="check-view" class="problem-view"><div class="large-text"></div><div class="small-text"></div></div><div id="select-view" class="problem-view"><div class="large-text"></div><div class="small-text"></div><div id="select-options-container"></div></div><div id="enter-view" class="problem-view"><div class="large-text"></div><div class="input-form"><input type="text" id="enter-input" class="text-input" placeholder="答えを入力"></div></div><div id="fill-view" class="problem-view"><div class="large-text"></div><div id="fill-content"></div><div class="input-form"></div></div></div><div id="action-area"><div id="feedback-container"><span id="feedback-text"></span><button id="add-to-review-btn">復習リストに追加</button></div><div id="check-button-container" class="button-container input-form"><button id="review-btn" class="btn-secondary">後でもう一度確認</button><button id="ok-btn" class="btn-success">OK</button></div><button id="action-btn" class="btn-primary"></button></div></div>
+        <div id="main-screen" class="screen"><div id="progress-area"><div id="progress-bar-container"><div id="progress-bar"></div></div><div class="progress-info"><div class="progress-info-left"><div id="progress-text"></div><div id="mistake-counter"></div></div><div id="importance-display"></div></div><div id="mode-indicator"></div></div><div id="content-area"><div id="check-view" class="problem-view"><div class="large-text"></div><div class="small-text"></div></div><div id="select-view" class="problem-view"><div class="large-text"></div><div class="small-text"></div><div id="select-options-container"></div></div><div id="enter-view" class="problem-view"><div class="large-text"></div><div class="input-form"><input type="text" id="enter-input" class="text-input" placeholder="答えを入力"></div></div><div id="fill-view" class="problem-view"><div class="large-text"></div><div id="fill-content"></div><div class="input-form"></div></div></div><div id="action-area"><div id="feedback-container"><span id="feedback-text"></span><button id="add-to-review-btn">復習リストに追加</button></div><div id="check-button-container" class="button-container input-form"><button id="review-btn" class="btn-secondary">後でもう一度確認</button><button id="ok-btn" class="btn-success btn-with-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg><span>OK</span></button></div><button id="action-btn" class="btn-primary"></button></div></div>
         
         <div id="intermediate-screen" class="screen">
             <button id="toggle-incorrect-list-btn" class="list-toggle-btn">&gt;</button>
@@ -336,11 +475,11 @@
                     <h1>お疲れ様でした！</h1>
                     <div class="results-summary"><div class="results-visual"><span id="results-percentage"></span></div><div id="results-details"></div></div>
                     <div class="results-options">
-                        <button id="retry-incorrect-btn" class="btn-primary">間違えた問題を復習</button>
-                        <button id="copy-incorrect-btn" class="btn-secondary">誤答問題をコピー</button>
-                        <button id="retry-all-btn" class="btn-secondary">もう一度すべて解く</button>
-                        <button id="retry-final-check-btn" class="btn-secondary">直前チェック (全問題)</button>
-                        <button id="restart-completely-btn" class="btn-secondary">新しい問題で始める</button>
+                        <button id="retry-incorrect-btn" class="btn-primary btn-with-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg><span>間違えた問題を復習</span></button>
+                        <button id="copy-incorrect-btn" class="btn-secondary btn-with-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg><span>誤答問題をコピー</span></button>
+                        <button id="retry-all-btn" class="btn-secondary btn-with-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg><span>もう一度すべて解く</span></button>
+                        <button id="retry-final-check-btn" class="btn-secondary btn-with-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg><span>直前チェック (全問題)</span></button>
+                        <button id="restart-completely-btn" class="btn-secondary btn-with-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><span>新しい問題で始める</span></button>
                     </div>
                 </div>
             </div>
@@ -355,8 +494,8 @@
                 <p>すべての問題をマスターしました！</p>
             </div>
             <div class="results-options">
-                <button id="end-retry-all-btn" class="btn-primary">もう一度すべて解く</button>
-                <button id="end-restart-btn" class="btn-secondary">新しい問題で始める</button>
+                <button id="end-retry-all-btn" class="btn-primary btn-with-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg><span>もう一度すべて解く</span></button>
+                <button id="end-restart-btn" class="btn-secondary btn-with-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><span>新しい問題で始める</span></button>
             </div>
         </div>
     </div>
