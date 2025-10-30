@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>汎用一問一答トレーニング</title>
+    <title>一問一答トレーニング</title>
     
     <link rel="icon" href="./icons/icon-v4-192.png" type="image/png">
     <link rel="apple-touch-icon" href="./icons/icon-v4-512.png">
@@ -140,8 +140,8 @@
         .incorrect-list-container { height: 100%; display: flex; flex-direction: column; border-right: 1px solid var(--border-color); padding-right: 2.2rem; min-height: 0; }
         .incorrect-list-container h3 { margin: 0 0 1.1rem 0; text-align: left; flex-shrink: 0; font-size: 1.5rem; }
         #incorrect-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; text-align: left; flex-grow: 1; }
-        #incorrect-list li { display: flex; justify-content: space-between; align-items: flex-start; gap: 1.1rem; padding: 0.9rem 0; border-bottom: 1px solid var(--light-bg); font-size: 1rem; }
-        #incorrect-list li:last-child { border-bottom: none; }
+        #incorrect-list li, #incorrect-list-main li { display: flex; justify-content: space-between; align-items: flex-start; gap: 1.1rem; padding: 0.9rem 0; border-bottom: 1px solid var(--light-bg); font-size: 1rem; }
+        #incorrect-list li:last-child, #incorrect-list-main li:last-child { border-bottom: none; }
         .incorrect-item-content { display: flex; gap: 0.9rem; align-items: flex-start; min-width: 0; }
         .incorrect-item-importance { color: var(--star-color); font-size: 1rem; flex-shrink: 0; letter-spacing: 1px; }
         .incorrect-item-text { word-break: break-all; }
@@ -163,14 +163,20 @@
         #end-screen #end-percentage { font-weight: 700; font-size: 33px; color: var(--success-color); z-index: 1; }
         #end-screen .results-options { margin: 0 auto; max-width: 330px; width: 100%; }
 
-        #main-screen { justify-content: space-between; height: calc(100vh - 32px); }
+        #main-screen { justify-content: space-between; height: calc(100vh - 32px); position: relative; overflow-x: hidden; }
         #progress-area { flex-shrink: 0; padding-bottom: 1rem; }
         #content-area { flex-grow: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; overflow-y: auto; padding: 1.1rem 0; width: 100%; }
         #action-area { flex-shrink: 0; min-height: 100px; display: flex; flex-direction: column; justify-content: flex-end; padding-top: 1.1rem; }
+        
+        .main-header-controls { display: flex; align-items: center; gap: 1rem; }
+        .main-header-buttons { display: flex; gap: 0.5rem; }
+        .header-btn { width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-md); background-color: var(--card-bg); border: 1px solid var(--border-color); color: var(--secondary-color); }
+        .header-btn:hover { background-color: var(--light-bg); color: var(--text-color); }
+        .header-btn svg { width: 22px; height: 22px; }
 
-        #progress-bar-container { width: 100%; height: 12px; background-color: var(--light-bg); border-radius: 6px; overflow: hidden; }
+        #progress-bar-container { width: 100%; height: 12px; background-color: var(--light-bg); border-radius: 6px; overflow: hidden; margin-bottom: 13px; }
         #progress-bar { width: 0%; height: 100%; background-color: var(--primary-color); border-radius: 6px; transition: width 0.4s ease; }
-        .progress-info { display: flex; justify-content: space-between; align-items: center; margin-top: 13px; }
+        .progress-info { display: flex; justify-content: space-between; align-items: center; }
         .progress-info-left { display: flex; align-items: center; gap: 1.1rem; }
         #progress-text { font-size: 1.2rem; color: var(--secondary-color); }
         #mistake-counter { font-size: 1.2rem; color: var(--danger-color); font-weight: 600; visibility: hidden; }
@@ -267,6 +273,31 @@
         #copy-textarea { width: 100%; height: 250px; resize: vertical; box-sizing: border-box; margin-top: 1rem; background-color: var(--light-bg); border: 1px solid var(--border-color); padding: 1rem; border-radius: var(--radius-sm); font-family: monospace; font-size: 1rem;}
 
         .list-toggle-btn, .list-overlay { display: none; }
+        
+        .incorrect-list-container-main {
+            position: fixed; left: 0; top: 0; width: 80vw; max-width: 400px; height: 100%; background-color: var(--card-bg); z-index: 1002;
+            transform: translateX(-100%); transition: transform 0.3s ease-in-out; padding: 1.5rem;
+            box-sizing: border-box; display: flex; flex-direction: column;
+        }
+        .incorrect-list-container-main h3 { margin: 0 0 1.1rem 0; text-align: left; flex-shrink: 0; font-size: 1.5rem; }
+        #incorrect-list-main { list-style: none; padding: 0; margin: 0 0 1rem; overflow-y: auto; text-align: left; flex-grow: 1; }
+        #interim-review-panel-btn { flex-shrink: 0; }
+        #main-screen.list-open .incorrect-list-container-main { transform: translateX(0); }
+        
+        #toggle-incorrect-list-btn-main {
+            display: flex; align-items: center; justify-content: center; position: fixed; left: 0px; top: 50%;
+            transform: translateY(-50%); z-index: 1003; width: 36px; height: 44px; border-radius: 0 8px 8px 0;
+            border: 1px solid var(--border-color); border-left: none; background-color: var(--card-bg); font-size: 1.5rem;
+            font-weight: bold; color: var(--primary-color); cursor: pointer; transition: left 0.3s ease-in-out;
+            padding: 0; padding-left: 2px;
+        }
+        #main-screen.list-open #toggle-incorrect-list-btn-main { left: min(80vw, 400px); }
+
+        .list-overlay-main {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4); z-index: 1001;
+            opacity: 0; transition: opacity 0.3s ease-in-out; pointer-events: none;
+        }
+        #main-screen.list-open .list-overlay-main { display: block; opacity: 1; pointer-events: auto; }
 
         @media (min-width: 769px) {
             body { padding: 80px 32px; min-height: calc(100vh - 160px); }
@@ -316,7 +347,7 @@
         <canvas id="confetti-canvas"></canvas>
         <div id="setup-screen" class="screen active centered-content">
             <div class="setup-content">
-                <h1>汎用一問一答トレーニング</h1>
+                <h1>一問一答トレーニング</h1>
                 <div class="description-wrapper">
                     <p>学習したい内容を貼り付け、オプションを選択して開始してください。</p>
                     <button id="help-btn" aria-label="入力形式のヘルプ">?</button>
@@ -352,7 +383,33 @@
             </div>
         </div>
 
-        <div id="main-screen" class="screen"><div id="progress-area"><div id="progress-bar-container"><div id="progress-bar"></div></div><div class="progress-info"><div class="progress-info-left"><div id="progress-text"></div><div id="mistake-counter"></div></div><div id="importance-display"></div></div><div id="mode-indicator"></div></div><div id="content-area"><div id="check-view" class="problem-view"><div class="large-text"></div><div class="small-text"></div></div><div id="select-view" class="problem-view"><div class="large-text"></div><div class="small-text"></div><div id="select-options-container"></div></div><div id="enter-view" class="problem-view"><div class="large-text"></div><div class="input-form"><input type="text" id="enter-input" class="text-input" placeholder="答えを入力"></div></div><div id="fill-view" class="problem-view"><div class="large-text"></div><div id="fill-content"></div><div class="input-form"></div></div></div><div id="action-area"><div id="feedback-container"><span id="feedback-text"></span><button id="add-to-review-btn">復習リストに追加</button></div><div id="check-button-container" class="button-container input-form"><button id="review-btn" class="btn-secondary">後でもう一度確認</button><button id="ok-btn" class="btn-success btn-with-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg><span>OK</span></button></div><div id="post-answer-buttons" class="button-container input-form"><button id="retry-current-problem-btn" class="btn-secondary btn-with-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"></path></svg><span>この問題を解き直す</span></button><button id="next-problem-btn" class="btn-primary">次へ</button></div><button id="action-btn" class="btn-primary"></button></div></div>
+        <div id="main-screen" class="screen">
+            <button id="toggle-incorrect-list-btn-main">&gt;</button>
+            <div class="list-overlay-main"></div>
+            <div class="incorrect-list-container-main">
+                <h3>間違えた問題</h3>
+                <ul id="incorrect-list-main"></ul>
+                <button id="interim-review-panel-btn" class="btn-primary btn-with-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"></path></svg><span>間違えた問題を一旦復習</span></button>
+            </div>
+            <div id="progress-area">
+                <div id="progress-bar-container"><div id="progress-bar"></div></div>
+                <div class="progress-info">
+                    <div class="progress-info-left">
+                        <div id="progress-text"></div>
+                        <div id="mistake-counter"></div>
+                    </div>
+                    <div class="main-header-controls">
+                        <div id="importance-display"></div>
+                        <div class="main-header-buttons">
+                            <button id="home-btn" class="header-btn" aria-label="ホームに戻る"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955a1.125 1.125 0 011.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h7.5" /></svg></button>
+                            <button id="interim-review-btn" class="header-btn" aria-label="間違えた問題を一旦復習"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"></path></svg></button>
+                        </div>
+                    </div>
+                </div>
+                <div id="mode-indicator"></div>
+            </div>
+            <div id="content-area"><div id="check-view" class="problem-view"><div class="large-text"></div><div class="small-text"></div></div><div id="select-view" class="problem-view"><div class="large-text"></div><div class="small-text"></div><div id="select-options-container"></div></div><div id="enter-view" class="problem-view"><div class="large-text"></div><div class="input-form"><input type="text" id="enter-input" class="text-input" placeholder="答えを入力"></div></div><div id="fill-view" class="problem-view"><div class="large-text"></div><div id="fill-content"></div><div class="input-form"></div></div></div><div id="action-area"><div id="feedback-container"><span id="feedback-text"></span><button id="add-to-review-btn">復習リストに追加</button></div><div id="check-button-container" class="button-container input-form"><button id="review-btn" class="btn-secondary">後でもう一度確認</button><button id="ok-btn" class="btn-success btn-with-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg><span>OK</span></button></div><div id="post-answer-buttons" class="button-container input-form"><button id="retry-current-problem-btn" class="btn-secondary btn-with-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"></path></svg><span>この問題を解き直す</span></button><button id="next-problem-btn" class="btn-primary">次へ</button></div><button id="action-btn" class="btn-primary"></button></div>
+        </div>
         
         <div id="intermediate-screen" class="screen">
             <button id="toggle-incorrect-list-btn" class="list-toggle-btn">&gt;</button>
@@ -433,7 +490,7 @@
 
             <div class="help-section" style="margin-bottom: 0;">
                 <h3><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a2.25 2.25 0 01-2.25 2.25h-1.5a2.25 2.25 0 01-2.25-2.25v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" /></svg>コピーして試そう</h3>
-                <p>以下の例文をコピーして、すぐにお試しいただけます。</p>
+                <p>以下の形式例をコピーして、例題を試すことができます。</p>
                 <div class="copy-example">[check]apple@りんご_3#
 [select]日本の首都は？@{東京}&lt;大阪&gt;&lt;京都&gt;_3#
 [enter]1+1=?@2_1#
@@ -449,8 +506,11 @@
         let currentIndex = 0, correctCount = 0, checkOKCount = 0, checkReviewCount = 0;
         let currentPassTotalForRate = 0, isReviewPhase = false, currentScreen = 'setup';
         let mistakeCount = 0, fillBlankRate = 100, isCheckOnlyMode = false, isFinalCheckMode = false;
+        let isRetryingCurrent = false;
+        let isInterimReview = false, savedState = null;
 
         const screens = { setup: document.getElementById('setup-screen'), main: document.getElementById('main-screen'), intermediate: document.getElementById('intermediate-screen'), end: document.getElementById('end-screen') };
+        const mainScreen = document.getElementById('main-screen');
         const views = { check: document.getElementById('check-view'), select: document.getElementById('select-view'), enter: document.getElementById('enter-view'), fill: document.getElementById('fill-view') };
         const feedbackContainer = document.getElementById('feedback-container'), feedbackText = document.getElementById('feedback-text'), actionBtn = document.getElementById('action-btn'),
               checkButtonContainer = document.getElementById('check-button-container'), progressBar = document.getElementById('progress-bar'),
@@ -466,6 +526,13 @@
         const nextProblemBtn = document.getElementById('next-problem-btn');
         const retryCurrentProblemBtn = document.getElementById('retry-current-problem-btn');
         
+        const homeBtn = document.getElementById('home-btn');
+        const interimReviewBtn = document.getElementById('interim-review-btn');
+        const interimReviewPanelBtn = document.getElementById('interim-review-panel-btn');
+        const toggleIncorrectListBtnMain = document.getElementById('toggle-incorrect-list-btn-main');
+        const listOverlayMain = document.querySelector('.list-overlay-main');
+        const incorrectListMain = document.getElementById('incorrect-list-main');
+
         const intermediateScreen = document.getElementById('intermediate-screen');
         const toggleIncorrectListBtn = document.getElementById('toggle-incorrect-list-btn');
         const listOverlay = document.querySelector('.list-overlay');
@@ -477,14 +544,17 @@
                 toggleIncorrectListBtn.innerHTML = intermediateScreen.classList.contains('list-open') ? '&lt;' : '&gt;';
             });
         }
-        if (listOverlay) {
-            listOverlay.addEventListener('click', (e) => {
+        if (listOverlay) { listOverlay.addEventListener('click', () => intermediateScreen.classList.remove('list-open')); }
+        
+        if (toggleIncorrectListBtnMain) {
+            toggleIncorrectListBtnMain.addEventListener('click', (e) => {
                 e.stopPropagation();
-                intermediateScreen.classList.remove('list-open');
-                toggleIncorrectListBtn.innerHTML = '&gt;';
+                mainScreen.classList.toggle('list-open');
+                toggleIncorrectListBtnMain.innerHTML = mainScreen.classList.contains('list-open') ? '&lt;' : '&gt;';
             });
         }
-
+        if (listOverlayMain) { listOverlayMain.addEventListener('click', () => mainScreen.classList.remove('list-open')); }
+        
         function setupModal(modal) {
             const overlay = modal.querySelector('.modal-overlay');
             const closeBtn = modal.querySelector('.modal-close-btn');
@@ -511,6 +581,22 @@
         document.getElementById('end-retry-all-btn').addEventListener('click', retryAll);
         document.getElementById('end-restart-btn').addEventListener('click', restartGame);
         fillRateSlider.addEventListener('input', (e) => { fillRateValue.textContent = e.target.value; });
+        
+        homeBtn.addEventListener('click', () => {
+            if (confirm('最初の画面に戻りますか？\n（入力した問題や設定は保持されます）')) {
+                if (isInterimReview) endInterimReview(false);
+                switchScreen('setup');
+            }
+        });
+
+        interimReviewBtn.addEventListener('click', () => {
+            if (isInterimReview) {
+                if (confirm('復習を中断して元の問題に戻りますか？')) endInterimReview(true);
+            } else {
+                startInterimReview();
+            }
+        });
+        interimReviewPanelBtn.addEventListener('click', startInterimReview);
 
         function switchScreen(screenName) {
             screens[currentScreen].classList.remove('visible');
@@ -518,13 +604,8 @@
                 screens[currentScreen].classList.remove('active');
                 currentScreen = screenName;
                 screens[currentScreen].classList.add('active');
-
-                if (screenName === 'intermediate') {
-                    showIntermediateResults();
-                } else if (screenName === 'end') {
-                    triggerPerfectAnimation();
-                }
-
+                if (screenName === 'intermediate') showIntermediateResults();
+                else if (screenName === 'end') triggerPerfectAnimation();
                 setTimeout(() => screens[currentScreen].classList.add('visible'), 50);
             }, 300);
         }
@@ -532,71 +613,62 @@
 
         function startGame(isCheckMode = false) {
             isFinalCheckMode = isCheckMode;
+            isInterimReview = false;
+            savedState = null;
             const allProblems = parseText(document.getElementById('input-text').value);
             const selectedImportance = document.querySelector('input[name="importance"]:checked').value;
             const [minImp, maxImp] = selectedImportance.split('-').map(Number);
             let filteredProblems = allProblems.filter(p => p.importance >= minImp && p.importance <= maxImp);
-            if (document.getElementById('shuffle-checkbox').checked) {
-                filteredProblems.sort(() => Math.random() - 0.5);
-            }
-            if (filteredProblems.length === 0) { alert('選択した重要度の問題がありません。'); return; }
+            if (document.getElementById('shuffle-checkbox').checked) filteredProblems.sort(() => Math.random() - 0.5);
+            if (filteredProblems.length === 0) { alert('選択した重要度の問題が存在しないか、形式に誤りがあります。'); return; }
             originalWordList = JSON.parse(JSON.stringify(filteredProblems));
             fillBlankRate = parseInt(fillRateSlider.value, 10);
             startNewPass(filteredProblems, false);
         }
         function startNewPass(problems, isReview) {
-            wordList = [...problems]; reviewList = []; currentIndex = 0; correctCount = 0; checkOKCount = 0; checkReviewCount = 0;
-            mistakeCount = 0;
-            currentPassTotalForRate = wordList.filter(p => p.type !== 'check').length;
+            wordList = [...problems]; reviewList = []; currentIndex = 0; correctCount = 0; checkOKCount = 0; checkReviewCount = 0; mistakeCount = 0;
+            currentPassTotalForRate = wordList.filter(p => p.type !== 'check' && !isFinalCheckMode).length;
             isCheckOnlyMode = wordList.every(p => p.type === 'check');
             isReviewPhase = isReview;
-            modeIndicator.textContent = isFinalCheckMode ? '直前チェック' : '通常モード';
+            modeIndicator.textContent = isFinalCheckMode ? '直前チェック' : (isReviewPhase ? '復習モード' : '通常モード');
+            updateIncorrectListPanel();
             switchScreen('main'); showNextProblem();
         }
         function retryIncorrect() { isFinalCheckMode = false; if (reviewList.length > 0) startNewPass(reviewList, true); }
         function retryAll() { isFinalCheckMode = false; startNewPass(originalWordList, false); }
-        function restartGame() { switchScreen('setup'); }
+        function restartGame() {
+            isInterimReview = false;
+            savedState = null;
+            switchScreen('setup'); 
+        }
         function parseImportance(text) { const match = text.match(/_([1-3])$/); return match ? { text: text.substring(0, text.length - 2).trim(), importance: parseInt(match[1], 10) } : { text: text.trim(), importance: 1 }; }
-        function parseText(text) { return text.trim().split('#').map(p => p.trim()).filter(Boolean).map(parseProblem).filter(Boolean); }
+        function parseText(text) { return text.trim().split('#').map(p => p.trim()).filter(Boolean).map(p => parseProblem(p)).filter(Boolean); }
         function parseProblem(pStr) {
             const { text: coreStr, importance } = parseImportance(pStr);
             let m;
-            if (m = coreStr.match(/^\[check\](.*?)\@(.*)$/s)) { return {type:'check', largeText:m[1].trim(), smallText:m[2].trim(), importance}; }
-            if (m = coreStr.match(/^\[enter\](.*?)\@(.*)$/s)) { return {type:'enter', largeText:m[1].trim(), correctAnswer:m[2].trim(), importance}; }
-            if (m = coreStr.match(/^\[fill\](.*?)\@(.*)$/s)) { const text = m[2]; const answers = []; const parts = []; let lastIndex = 0; for (const fm of text.matchAll(/<([^>]+)>/g)) { parts.push(text.substring(lastIndex, fm.index)); answers.push(fm[1].trim()); lastIndex = fm.index + fm[0].length; } parts.push(text.substring(lastIndex)); return {type:'fill', largeText:m[1].trim(), questionParts:parts, answers, importance}; }
-            if (m = coreStr.match(/^\[select\](.*?)\@(.*?)((?:<[^>]+>|{[^}]+})+)$/s)) { const [,largeText, smallText, optionsStr] = m; const options = []; let correctAnswer = ''; [...optionsStr.matchAll(/<([^>]+)>|{([^}]+)}/g)].forEach(o => { (o[1]) ? options.push(o[1].trim()) : (correctAnswer=o[2].trim(), options.push(correctAnswer)); }); return {type:'select', largeText:largeText.trim(), smallText:smallText.trim(), options, correctAnswer, importance}; }
+            const baseProblem = { importance, originalString: pStr };
+            if (m = coreStr.match(/^\[check\](.*?)\@(.*)$/s)) return {...baseProblem, type:'check', largeText:m[1].trim(), smallText:m[2].trim()};
+            if (m = coreStr.match(/^\[enter\](.*?)\@(.*)$/s)) return {...baseProblem, type:'enter', largeText:m[1].trim(), correctAnswer:m[2].trim()};
+            if (m = coreStr.match(/^\[fill\](.*?)\@(.*)$/s)) { const text = m[2]; const answers = []; const parts = []; let lastIndex = 0; for (const fm of text.matchAll(/<([^>]+)>/g)) { parts.push(text.substring(lastIndex, fm.index)); answers.push(fm[1].trim()); lastIndex = fm.index + fm[0].length; } parts.push(text.substring(lastIndex)); return {...baseProblem, type:'fill', largeText:m[1].trim(), questionParts:parts, answers}; }
+            if (m = coreStr.match(/^\[select\](.*?)\@(.*?)((?:<[^>]+>|{[^}]+})+)$/s)) { const [,largeText, smallText, optionsStr] = m; const options = []; let correctAnswer = ''; [...optionsStr.matchAll(/<([^>]+)>|{([^}]+)}/g)].forEach(o => { (o[1]) ? options.push(o[1].trim()) : (correctAnswer=o[2].trim(), options.push(correctAnswer)); }); return {...baseProblem, type:'select', largeText:largeText.trim(), smallText:smallText.trim(), options, correctAnswer}; }
             return null;
         }
         
-        function reconstructProblemString(p) {
-            let coreStr = '';
-            switch (p.type) {
-                case 'check': coreStr = `[check]${p.largeText}@${p.smallText}`; break;
-                case 'enter': coreStr = `[enter]${p.largeText}@${p.correctAnswer}`; break;
-                case 'select':
-                    const optionsStr = p.options.map(opt => (opt === p.correctAnswer ? `{${opt}}` : `<${opt}>`)).sort().join('');
-                    coreStr = `[select]${p.largeText}@${p.smallText}${optionsStr}`;
-                    break;
-                case 'fill':
-                    const answerPart = p.questionParts.map((part, i) => part + (i < p.answers.length ? `<${p.answers[i]}>` : '')).join('');
-                    coreStr = `[fill]${p.largeText}@${answerPart}`;
-                    break;
-            }
-            return `${coreStr}_${p.importance}`;
-        }
+        function reconstructProblemString(p) { return p.originalString; }
 
         function normalizeAnswer(str) {
             if (typeof str !== 'string') return '';
             const trimmedStr = str.trim().replace(/\.\.\./g, '…');
-            if (trimmedStr.includes('、')) {
-                return trimmedStr.split('、').map(part => part.trim()).filter(part => part.length > 0).sort().join('、');
-            }
+            if (trimmedStr.includes('、')) return trimmedStr.split('、').map(part => part.trim()).filter(Boolean).sort().join('、');
             return trimmedStr;
         }
 
         function showNextProblem() {
+            isRetryingCurrent = false;
             if (currentIndex >= wordList.length) {
-                if (reviewList.length === 0) { switchScreen('end'); } else { switchScreen('intermediate'); }
+                if (isInterimReview) endInterimReview(true);
+                else if (reviewList.length === 0) switchScreen('end');
+                else switchScreen('intermediate');
                 return;
             }
             updateProgress();
@@ -606,20 +678,18 @@
             postAnswerButtons.classList.remove('active');
             addToReviewBtn.style.display = 'none';
             Object.values(views).forEach(v => v.style.display = 'none');
-
             const problem = wordList[currentIndex];
-            const reviewMark = isReviewPhase ? `<span class="review-indicator">復習</span>` : '';
+            let reviewMark = isReviewPhase ? `<span class="review-indicator">復習</span>` : '';
+            if (isInterimReview) reviewMark = `<span class="review-indicator" style="background-color: var(--warning-color); color: white;">一旦復習</span>`;
             const view = views[isFinalCheckMode ? 'check' : problem.type];
             const largeTextContent = view.querySelector('.large-text');
             largeTextContent.innerHTML = '';
             const textSpan = document.createElement('span'); textSpan.textContent = problem.largeText;
             largeTextContent.appendChild(textSpan);
-            if (isReviewPhase) largeTextContent.insertAdjacentHTML('beforeend', reviewMark);
-            
+            if (reviewMark) largeTextContent.insertAdjacentHTML('beforeend', reviewMark);
             view.classList.add('is-entering');
             view.style.display = 'block';
             requestAnimationFrame(() => { view.classList.remove('is-entering'); });
-
             if (isFinalCheckMode) {
                 let answerHtml = '';
                 switch(problem.type) {
@@ -661,7 +731,6 @@
             const totalBlanks = problem.answers.length;
             const blanksToShow = Math.round(totalBlanks * (fillBlankRate / 100));
             const blankIndices = new Set([...Array(totalBlanks).keys()].sort(() => 0.5 - Math.random()).slice(0, blanksToShow));
-
             problem.questionParts.forEach((part, index) => {
                 contentDiv.appendChild(document.createTextNode(part));
                 if (index < totalBlanks) {
@@ -681,39 +750,54 @@
         }
         
         function retryCurrentProblem() {
+            isRetryingCurrent = true;
             feedbackContainer.classList.remove('visible', 'correct', 'incorrect');
             postAnswerButtons.classList.remove('active');
+            addToReviewBtn.style.display = 'none';
             const problem = wordList[currentIndex];
-            if (problem.type === 'select') {
-                setupSelect(problem);
-            } else if (problem.type === 'enter') {
-                setupEnter(problem);
-            } else if (problem.type === 'fill') {
-                setupFill(problem);
-            }
+            if (problem.type === 'select') setupSelect(problem);
+            else if (problem.type === 'enter') setupEnter(problem);
+            else if (problem.type === 'fill') setupFill(problem);
         }
         
         function handleAnswerFeedback(isCorrect, correctAnswerText) {
             const problem = wordList[currentIndex];
-            if (problem.type === 'check' || isFinalCheckMode) { isCorrect ? checkOKCount++ : checkReviewCount++; } 
-            else { if(isCorrect) correctCount++; }
-            if (!isCorrect) {
-                if(!reviewList.includes(problem)) reviewList.push(problem);
-                if(problem.type !== 'check' && !isFinalCheckMode) mistakeCount++;
+            if (!isRetryingCurrent) {
+                if (isInterimReview) {
+                    if (isCorrect) {
+                        correctCount++;
+                        mistakeCount--;
+                        savedState.reviewList = savedState.reviewList.filter(p => p.originalString !== problem.originalString);
+                    } else {
+                        if (!reviewList.some(p => p.originalString === problem.originalString)) reviewList.push(problem);
+                    }
+                } else {
+                    if (problem.type === 'check' || isFinalCheckMode) isCorrect ? checkOKCount++ : checkReviewCount++;
+                    else if(isCorrect) correctCount++;
+                    if (!isCorrect) {
+                        if(!reviewList.some(p => p.originalString === problem.originalString)) reviewList.push(problem);
+                        if(problem.type !== 'check' && !isFinalCheckMode) mistakeCount++;
+                    }
+                    updateIncorrectListPanel();
+                }
             }
             if (problem.type !== 'check' && !isFinalCheckMode) {
                 feedbackText.textContent = isCorrect ? '正解！' : `不正解　正しい解答: ${correctAnswerText}`;
                 feedbackContainer.classList.add(isCorrect ? 'correct' : 'incorrect', 'visible');
-                addToReviewBtn.style.display = 'block'; const isInReviewList = reviewList.includes(problem); addToReviewBtn.disabled = isInReviewList;
-                addToReviewBtn.textContent = isInReviewList ? '追加済み' : '復習リストに追加';
-                addToReviewBtn.onclick = () => { if (!reviewList.includes(problem)) { reviewList.push(problem); addToReviewBtn.disabled = true; addToReviewBtn.textContent = '追加済み'; } };
-                
+                if (!isRetryingCurrent && !isInterimReview) {
+                    addToReviewBtn.style.display = 'block';
+                    const isInReviewList = reviewList.some(p => p.originalString === problem.originalString);
+                    addToReviewBtn.disabled = isInReviewList;
+                    addToReviewBtn.textContent = isInReviewList ? '追加済み' : '復習リストに追加';
+                    addToReviewBtn.onclick = () => { if (!reviewList.some(p => p.originalString === problem.originalString)) { reviewList.push(problem); addToReviewBtn.disabled = true; addToReviewBtn.textContent = '追加済み'; updateIncorrectListPanel();} };
+                }
                 actionBtn.classList.remove('visible');
                 postAnswerButtons.classList.add('active');
                 nextProblemBtn.onclick = moveToNextProblem;
                 retryCurrentProblemBtn.onclick = retryCurrentProblem;
-
-            } else { moveToNextProblem(); }
+            } else {
+                moveToNextProblem();
+            }
             updateProgress();
         }
         function showIntermediateResults() {
@@ -728,20 +812,16 @@
             const visualEl = screens.intermediate.querySelector('.results-visual');
             const percentageEl = document.getElementById('results-percentage');
             document.getElementById('results-details').textContent = detailsText;
-            
             const rootStyles = getComputedStyle(document.documentElement);
             const startColorHex = rootStyles.getPropertyValue('--danger-color').trim();
             let endColorHex;
             if (percentage >= 80) endColorHex = rootStyles.getPropertyValue('--success-color').trim();
             else if (percentage >= 50) endColorHex = rootStyles.getPropertyValue('--warning-color').trim();
             else endColorHex = startColorHex;
-
             triggerMeterAnimation(percentage, visualEl, percentageEl, startColorHex, endColorHex);
-
             const hasIncorrect = reviewList.length > 0;
             document.getElementById('retry-incorrect-btn').disabled = !hasIncorrect;
             document.getElementById('copy-incorrect-btn').disabled = !hasIncorrect;
-            
             const listEl = document.getElementById('incorrect-list');
             listEl.innerHTML = '';
             reviewList.sort((a, b) => b.importance - a.importance).forEach(problem => {
@@ -762,10 +842,50 @@
             if (mistakeCount > 0) { mistakeCounter.textContent = `✗ ${mistakeCount}`; mistakeCounter.classList.add('visible'); } else { mistakeCounter.classList.remove('visible'); }
             if (currentIndex < total) { const problem = wordList[currentIndex]; importanceDisplay.textContent = '★'.repeat(problem.importance) + '☆'.repeat(3 - problem.importance); }
         }
+        
+        function updateIncorrectListPanel() {
+            incorrectListMain.innerHTML = '';
+            reviewList.sort((a, b) => b.importance - a.importance).forEach(problem => {
+                const li = document.createElement('li');
+                let correctAnswerText = '';
+                switch (problem.type) { case 'check': correctAnswerText = problem.smallText; break; case 'enter': case 'select': correctAnswerText = problem.correctAnswer; break; case 'fill': correctAnswerText = problem.answers.join(', '); break; }
+                const importanceStars = '★'.repeat(problem.importance) + '☆'.repeat(3 - problem.importance);
+                li.innerHTML = `<div class="incorrect-item-content"><span class="incorrect-item-importance">${importanceStars}</span><span class="incorrect-item-text">${problem.largeText}</span></div><span class="incorrect-item-answer">${correctAnswerText}</span>`;
+                incorrectListMain.appendChild(li);
+            });
+            const hasIncorrect = reviewList.length > 0;
+            interimReviewPanelBtn.disabled = !hasIncorrect;
+            interimReviewBtn.disabled = !hasIncorrect;
+        }
+
+        function startInterimReview() {
+            if (reviewList.length === 0) { alert('復習する問題がありません。'); return; }
+            if (!confirm('間違えた問題を復習しますか？')) return;
+            mainScreen.classList.remove('list-open');
+            isInterimReview = true;
+            savedState = { wordList: [...wordList], currentIndex, reviewList: [...reviewList] };
+            wordList = [...reviewList].sort(() => Math.random() - 0.5);
+            reviewList = [];
+            currentIndex = 0;
+            modeIndicator.textContent = '一旦復習モード';
+            showNextProblem();
+        }
+
+        function endInterimReview(resume) {
+            if (!isInterimReview) return;
+            wordList = savedState.wordList;
+            currentIndex = savedState.currentIndex;
+            reviewList = savedState.reviewList;
+            isInterimReview = false;
+            savedState = null;
+            modeIndicator.textContent = isFinalCheckMode ? '直前チェック' : (isReviewPhase ? '復習モード' : '通常モード');
+            updateIncorrectListPanel();
+            if(resume) showNextProblem();
+        }
 
         const easeInOutCubic = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
         function hexToRgb(hex) { const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex); return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : null; }
-        function rgbToHsv(r, g, b) { r /= 255, g /= 255, b /= 255; let max = Math.max(r, g, b), min = Math.min(r, g, b); let h, s, v = max; let d = max - min; s = max == 0 ? 0 : d / max; if (max == min) { h = 0; } else { switch (max) { case r: h = (g - b) / d + (g < b ? 6 : 0); break; case g: h = (b - r) / d + 2; break; case b: h = (r - g) / d + 4; break; } h /= 6; } return { h: h * 360, s: s, v: v }; }
+        function rgbToHsv(r, g, b) { r /= 255, g /= 255, b /= 255; let max = Math.max(r, g, b), min = Math.min(r, g, b); let h, s, v = max; let d = max - min; s = max == 0 ? 0 : d / max; if (max == min) h = 0; else { switch (max) { case r: h = (g - b) / d + (g < b ? 6 : 0); break; case g: h = (b - r) / d + 2; break; case b: h = (r - g) / d + 4; break; } h /= 6; } return { h: h * 360, s: s, v: v }; }
         function hsvToRgb(h, s, v) { let r, g, b; let i = Math.floor(h / 60) % 6; let f = h / 60 - i; let p = v * (1 - s); let q = v * (1 - f * s); let t = v * (1 - (1 - f) * s); switch (i) { case 0: r = v, g = t, b = p; break; case 1: r = q, g = v, b = p; break; case 2: r = p, g = v, b = t; break; case 3: r = p, g = q, b = v; break; case 4: r = t, g = p, b = v; break; case 5: r = v, g = p, b = q; break; } return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) }; }
         function triggerMeterAnimation(targetPercentage, visualEl, percentageEl, startColorHex, endColorHex) {
             visualEl.style.setProperty('--percentage', 0); percentageEl.textContent = '0%';
